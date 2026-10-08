@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="data:," />
+<title>Pulse theme – preview harness</title>
+<!--
+  Applies themes/pulse.yaml the way Home Assistant does (theme variables as inline styles on <html>,
+  over HA's own defaults), next to native-style mock cards and our three real card bundles.
+
+  Serve the parent Projects folder so the sibling card repos are reachable:
+    cd C:\Users\Timos\Documents\Projects  &&  python -m http.server 8765
+    http://localhost:8765/pulse-theme/test/preview.html
+
+  Query options: ?theme=pulse|glass|tonal|none (none = HA default)  ?dark=1  ?lang=el  ?width=380 (phone frame)
+  Entity names are invented. Screenshots for the README come from this page.
+-->
+<script src="../../area-pulse-card/test/icons.js"></script>
+<script>window.__MDI = { ...window.MDI };</script>
+<script src="../../home-pulse-card/test/icons.js"></script>
+<script>window.__MDI = { ...window.__MDI, ...window.MDI };</script>
+<script src="../../stock-pulse/test/icons.js"></script>
+<script>window.MDI = { ...window.__MDI, ...window.MDI };</script>
+<style>
+  /* Home Assistant's own defaults (frontend 2026.10, color.globals.ts), the base every theme layers on. */
+  :root {
+    --primary-text-color: #141414; --secondary-text-color: #5e5e5e; --disabled-text-color: #bdbdbd; --text-primary-color: #ffffff;
+    --primary-color: #009ac7; --accent-color: #ff9800; --divider-color: rgba(0, 0, 0, 0.12); --outline-color: rgba(0, 0, 0, 0.12);
+    --card-background-color: #ffffff; --primary-background-color: #fafafa; --secondary-background-color: #e5e5e5;
+    --state-icon-color: #44739e; --error-color: #db4437; --warning-color: #ffa600; --success-color: #43a047; --info-color: #039be5;
+    --red-color: #f44336; --pink-color: #e91e63; --purple-color: #926bc7; --indigo-color: #3f51b5; --blue-color: #2196f3;
+    --light-blue-color: #03a9f4; --cyan-color: #00bcd4; --teal-color: #009688; --green-color: #4caf50; --amber-color: #ffc107;
+    --orange-color: #ff9800; --deep-orange-color: #ff6f22; --grey-color: #9e9e9e; --disabled-color: #bdbdbd;
+    --ha-color-primary-30: #006787; --ha-color-primary-40: #009ac7; --ha-color-primary-60: #37c8fd;
+    --ha-font-family-body: Roboto, Noto, sans-serif;
+    /* derived, exactly as HA declares them */
+    --state-active-color: var(--amber-color); --state-inactive-color: var(--grey-color);
+    --state-light-active-color: var(--amber-color); --state-switch-active-color: var(--amber-color);
+    --state-binary_sensor-active-color: var(--amber-color); --state-binary_sensor-moisture-on-color: var(--red-color);
+    --state-climate-heat-color: var(--deep-orange-color); --state-climate-cool-color: var(--blue-color);
+    --state-lock-locked-color: var(--green-color); --state-lock-unlocked-color: var(--red-color);
+    --state-media_player-active-color: var(--light-blue-color); --state-person-home-color: var(--green-color);
+    --state-fan-active-color: var(--cyan-color); --state-cover-active-color: var(--purple-color);
+    --sidebar-text-color: var(--primary-text-color); --sidebar-background-color: var(--card-background-color);
+    --sidebar-selected-text-color: var(--primary-color); --sidebar-selected-icon-color: var(--primary-color);
+    --sidebar-icon-color: rgba(20, 20, 20, 0.6);
+    --app-header-text-color: var(--sidebar-text-color); --app-header-background-color: var(--sidebar-background-color);
+    --mdc-theme-surface: var(--card-background-color);
+  }
+  html.dark {
+    --primary-background-color: #111111; --card-background-color: #1c1c1c; --secondary-background-color: #282828;
+    --primary-text-color: #e1e1e1; --secondary-text-color: #9b9b9b; --disabled-text-color: #6f6f6f;
+    --divider-color: rgba(225, 225, 225, 0.12); --outline-color: rgba(225, 225, 225, 0.12); --sidebar-icon-color: rgba(225, 225, 225, 0.6);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: var(--ha-font-family-body); color: var(--primary-text-color); background: var(--primary-background-color); -webkit-font-smoothing: antialiased; font-size: 14px; }
+
+  /* ---- app chrome */
+  .app { display: flex; min-height: 100%; }
+  .frame { margin: 0 auto; }
+  .sidebar { width: 256px; flex: none; background: var(--sidebar-background-color); border-right: 1px solid var(--divider-color); padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar .brand { height: 48px; display: flex; align-items: center; padding: 0 12px; font-size: 20px; color: var(--sidebar-text-color); }
+  .sidebar a { display: flex; align-items: center; gap: 16px; height: 40px; padding: 0 12px; border-radius: 12px; color: var(--sidebar-text-color); text-decoration: none; }
+  .sidebar a ha-icon { color: var(--sidebar-icon-color); }
+  .sidebar a.sel { color: var(--sidebar-selected-text-color); background: color-mix(in srgb, var(--sidebar-selected-icon-color) 12%, transparent); }
+  .sidebar a.sel ha-icon { color: var(--sidebar-selected-icon-color); }
+  main { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; }
+  .bg { position: absolute; inset: 0; background: var(--lovelace-background, var(--primary-background-color)); z-index: 0; }
+  .toolbar { position: sticky; top: 0; z-index: 2; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px;
+    background: var(--app-header-background-color); color: var(--app-header-text-color); border-bottom: 1px solid var(--divider-color);
+    backdrop-filter: var(--app-header-backdrop-filter, none); -webkit-backdrop-filter: var(--app-header-backdrop-filter, none); }
+  .toolbar .title { font-size: 20px; flex: 1; }
+  .toolbar .tabs { display: flex; gap: 4px; }
+  .toolbar .tab { padding: 6px 12px; border-radius: 99px; font-size: 14px; }
+  .toolbar .tab.sel { background: color-mix(in srgb, var(--primary-color) 14%, transparent); color: var(--primary-color); }
+  .view { position: relative; z-index: 1; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 24px 16px; align-items: start; }
+  .section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
+  .section h2 { margin: 4px 4px 0; font-size: 20px; font-weight: 400; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; grid-column: 1 / -1; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 8px; border-radius: 18px; font-size: 13px;
+    background: var(--ha-card-background, var(--card-background-color)); border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color));
+    backdrop-filter: var(--ha-card-backdrop-filter, none); -webkit-backdrop-filter: var(--ha-card-backdrop-filter, none); }
+  .badge ha-icon { --mdc-icon-size: 18px; color: var(--c); }
+  .badge small { color: var(--secondary-text-color); }
+
+  /* ---- native-style cards (look of hui-tile-card and friends, driven by the same variables) */
+  .tile { display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+  .tile .top { display: flex; align-items: center; gap: 10px; }
+  .ti { position: relative; width: 36px; height: 36px; flex: none; display: grid; place-items: center; color: var(--tile-color);
+    border-radius: var(--ha-tile-icon-border-radius, 50%); }
+  .ti::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--tile-color); opacity: 0.2; }
+  .tile.off .ti { color: var(--state-inactive-color); } .tile.off .ti::before { opacity: 0.15; }
+  .ti ha-icon { position: relative; }
+  .info { display: grid; min-width: 0; }
+  .info b { font-weight: 500; font-size: 14px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info small { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .feature { height: 42px; border-radius: var(--ha-card-features-border-radius, 12px); background: color-mix(in srgb, var(--tile-color) 20%, transparent); overflow: hidden; }
+  .feature i { display: block; height: 100%; width: var(--v); background: var(--tile-color); }
+  .entities { padding: 4px 16px 8px; }
+  .entities h3 { margin: 12px 0 4px; font-size: 20px; font-weight: 400; }
+  .erow { display: flex; align-items: center; gap: 16px; min-height: 48px; }
+  .erow ha-icon { color: var(--state-icon-color); } .erow ha-icon.on { color: var(--c); }
+  .erow span { flex: 1; } .erow small { color: var(--secondary-text-color); font-size: 14px; }
+  .sw { width: 36px; height: 20px; border-radius: 10px; background: var(--ha-color-primary-40, var(--primary-color)); position: relative; flex: none; }
+  .sw::after { content: ""; position: absolute; top: 3px; right: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+  .sw.off { background: color-mix(in srgb, var(--primary-text-color) 30%, transparent); } .sw.off::after { right: auto; left: 3px; }
+  .thermo { padding: 16px; display: grid; justify-items: center; gap: 4px; }
+  .thermo svg { width: 180px; height: 150px; }
+  .thermo .big { font-size: 44px; font-weight: 400; margin-top: -102px; }
+  .thermo small { color: var(--secondary-text-color); }
+  .thermo .modes { display: flex; gap: 8px; margin-top: 48px; }
+  .thermo .modes span { width: 44px; height: 44px; border-radius: var(--ha-card-features-border-radius, 12px); display: grid; place-items: center; background: color-mix(in srgb, var(--primary-text-color) 6%, transparent); }
+  .thermo .modes span.sel { background: color-mix(in srgb, var(--state-climate-heat-color) 20%, transparent); color: var(--state-climate-heat-color); }
+  .media { padding: 16px; display: grid; gap: 10px; }
+  .media .t { display: flex; gap: 12px; align-items: center; }
+  .media .art { width: 56px; height: 56px; border-radius: 12px; background: color-mix(in srgb, var(--state-media_player-active-color) 30%, transparent); display: grid; place-items: center; color: var(--state-media_player-active-color); }
+  .media .bar { height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--primary-text-color) 12%, transparent); }
+  .media .bar i { display: block; height: 100%; width: 38%; border-radius: inherit; background: var(--primary-color); }
+  .media .ctl { display: flex; justify-content: center; gap: 20px; color: var(--primary-text-color); }
+  .button { padding: 18px 12px 14px; display: grid; justify-items: center; gap: 8px; }
+  .button ha-icon { --mdc-icon-size: 40px; color: var(--c); }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; align-items: center; }
+  .btn { height: 36px; padding: 0 16px; border-radius: 18px; display: inline-flex; align-items: center; font-weight: 500; background: var(--ha-color-primary-40, var(--primary-color)); color: #fff; }
+  .btn.plain { background: color-mix(in srgb, var(--primary-text-color) 8%, transparent); color: var(--primary-text-color); }
+  .link { color: var(--primary-color); font-weight: 500; }
+
+  /* ---- a more-info dialog over a scrim */
+  .dialog-stage { position: relative; grid-column: 1 / -1; min-height: 330px; border-radius: 16px; overflow: hidden; }
+  .dialog-stage .under { position: absolute; inset: 0; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; align-content: start; opacity: 0.9; }
+  .dialog-stage .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.32); backdrop-filter: var(--ha-dialog-scrim-backdrop-filter, none); }
+  .dialog { position: relative; margin: 28px auto; width: min(420px, calc(100% - 32px)); border-radius: var(--ha-dialog-border-radius, 28px); padding: 20px 24px;
+    background: var(--ha-dialog-surface-background, var(--mdc-theme-surface)); backdrop-filter: var(--ha-dialog-surface-backdrop-filter, none);
+    -webkit-backdrop-filter: var(--ha-dialog-surface-backdrop-filter, none); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); display: grid; gap: 14px; }
+  .dialog header { display: flex; align-items: center; gap: 12px; font-size: 20px; }
+  .dialog .slider { height: 140px; width: 96px; margin: 0 auto; border-radius: 24px; background: color-mix(in srgb, var(--state-light-active-color) 20%, transparent); overflow: hidden; display: flex; align-items: end; }
+  .dialog .slider i { display: block; width: 100%; height: 70%; background: var(--state-light-active-color); }
+  .dialog footer { display: flex; justify-content: flex-end; gap: 8px; }
+
+  .cap { font-size: 12px; color: var(--secondary-text-color); margin: 0 4px; }
+  @media (max-width: 870px) { .sidebar { display: none; } }
+</style>
+<script>
+  // ---- Stubs for HA's own elements (enough for our cards to render outside HA)
+  class HaIcon extends HTMLElement {
+    static get observedAttributes() { return ["icon"]; }
+    set icon(v) { this._icon = v; this.draw(); } get icon() { return this._icon; }
+    attributeChangedCallback() { this._icon = this.getAttribute("icon"); this.draw(); }
+    connectedCallback() { this.style.display = "inline-flex"; this.draw(); }
+    draw() {
+      if (!this.shadowRoot) this.attachShadow({ mode: "open" });
+      const alias = { "mdi:molecule-co2": "mdi:molecule-co-2" };
+      const p = window.MDI[alias[this._icon] || this._icon];
+      const s = "var(--mdc-icon-size, 24px)";
+      this.shadowRoot.innerHTML = p ? `<svg viewBox="0 0 24 24" style="width:${s};height:${s};fill:currentColor"><path d="${p}"/></svg>`
+        : `<span style="width:${s};height:${s};display:inline-block;border:1px dashed currentColor;border-radius:4px"></span>`;
+      if (!p && this._icon) console.warn("missing icon", this._icon);
+    }
+  }
+  customElements.define("ha-icon", HaIcon);
+  customElements.define("ha-state-icon", class extends HaIcon {
+    set stateObj(s) {
+      const d = s.entity_id.split(".")[0], dc = s.attributes.device_class, on = s.state === "on";
+      this.icon = s.attributes.icon || { window: on ? "mdi:window-open-variant" : "mdi:window-closed-variant", door: on ? "mdi:door-open" : "mdi:door-closed", moisture: "mdi:water-alert" }[dc]
+        || { light: on ? "mdi:lightbulb-on" : "mdi:lightbulb", switch: "mdi:power-socket-eu", media_player: "mdi:speaker", lock: "mdi:lock", fan: "mdi:fan", climate: "mdi:thermostat",
+             binary_sensor: ["motion", "occupancy", "presence"].includes(dc) ? "mdi:motion-sensor" : undefined }[d] || "mdi:gauge";
+    }
+  });
+  // Same CSS variables the real ha-card reads (src/components/ha-card.ts).
+  customElements.define("ha-card", class extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: "open" }).innerHTML = `<style>:host{display:block;position:relative;box-sizing:border-box;color:var(--primary-text-color);
+        background:var(--ha-card-background,var(--card-background-color,white));border-radius:var(--ha-card-border-radius,12px);
+        border:var(--ha-card-border-width,1px) solid var(--ha-card-border-color,var(--divider-color,#e0e0e0));box-shadow:var(--ha-card-box-shadow,none);
+        -webkit-backdrop-filter:var(--ha-card-backdrop-filter,none);backdrop-filter:var(--ha-card-backdrop-filter,none);transition:all .3s ease-out}</style><slot></slot>`;
+    }
+  });
+</script>
+</head>
+<body>
+<div class="app frame" id="frame">
+  <aside class="sidebar">
+    <div class="brand">Home Assistant</div>
+    <a class="sel" href="#"><ha-icon icon="mdi:view-dashboard-outline"></ha-icon>Overview</a>
+    <a href="#"><ha-icon icon="mdi:lightning-bolt"></ha-icon>Energy</a>
+    <a href="#"><ha-icon icon="mdi:format-list-checks"></ha-icon>To-do lists</a>
+    <a href="#"><ha-icon icon="mdi:devices"></ha-icon>Settings</a>
+  </aside>
+  <main>
+    <div class="bg"></div>
+    <div class="toolbar"><span class="title">Home</span><span class="tabs"><span class="tab sel">Overview</span><span class="tab">Rooms</span></span></div>
+    <div class="view" id="view">
+      <div class="badges">
+        <span class="badge" style="--c:var(--state-person-home-color)"><ha-icon icon="mdi:account"></ha-icon>Alex <small>Home</small></span>
+        <span class="badge" style="--c:var(--state-icon-color)"><ha-icon icon="mdi:thermometer"></ha-icon>Outside <small>14 °C</small></span>
+        <span class="badge" style="--c:var(--state-light-active-color)"><ha-icon icon="mdi:lightbulb-group"></ha-icon>Lights <small>3 on</small></span>
+      </div>
+
+      <div class="section">
+        <h2>Living room</h2>
+        <div class="row2">
+          <ha-card class="tile" style="--tile-color:var(--state-light-active-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:lightbulb-on"></ha-icon></span><span class="info"><b>Ceiling light</b><small>On · 70%</small></span></div><div class="feature" style="--v:70%"><i></i></div></ha-card>
+          <ha-card class="tile" style="--tile-color:var(--state-binary_sensor-door-on-color, var(--state-binary_sensor-active-color))"><div class="top"><span class="ti"><ha-icon icon="mdi:door-open"></ha-icon></span><span class="info"><b>Patio door</b><small>Open</small></span></div></ha-card>
+          <ha-card class="tile" style="--tile-color:var(--state-climate-heat-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:thermostat"></ha-icon></span><span class="info"><b>Hall thermostat</b><small>Heating · 21.5 °C</small></span></div></ha-card>
+          <ha-card class="tile" style="--tile-color:var(--state-binary_sensor-moisture-on-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:water-alert"></ha-icon></span><span class="info"><b>Under-sink leak</b><small>Wet</small></span></div></ha-card>
+          <ha-card class="tile" style="--tile-color:var(--state-lock-locked-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:lock"></ha-icon></span><span class="info"><b>Front door</b><small>Locked</small></span></div></ha-card>
+          <ha-card class="tile" style="--tile-color:var(--state-media_player-active-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:speaker"></ha-icon></span><span class="info"><b>Kitchen speaker</b><small>Playing</small></span></div></ha-card>
+          <ha-card class="tile off" style="--tile-color:var(--state-fan-active-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:fan-off"></ha-icon></span><span class="info"><b>Bedroom fan</b><small>Off</small></span></div></ha-card>
+          <ha-card class="tile" style="--tile-color:var(--state-cover-active-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:window-shutter-open"></ha-icon></span><span class="info"><b>Study blinds</b><small>Open · 60%</small></span></div></ha-card>
+        </div>
+        <ha-card class="entities">
+          <h3>Switches</h3>
+          <div class="erow"><ha-icon icon="mdi:power-socket-eu" class="on" style="--c:var(--state-switch-active-color)"></ha-icon><span>Coffee machine</span><i class="sw"></i></div>
+          <div class="erow"><ha-icon icon="mdi:power-plug-off-outline"></ha-icon><span>Desk lamp plug</span><i class="sw off"></i></div>
+          <div class="erow"><ha-icon icon="mdi:thermometer"></ha-icon><span>Balcony temperature</span><small>14.2 °C</small></div>
+        </ha-card>
+      </div>
+
+      <div class="section">
+        <h2>Climate and media</h2>
+        <ha-card class="thermo">
+          <svg viewBox="0 0 180 150" aria-hidden="true"><path d="M30 130 A70 70 0 1 1 150 130" fill="none" stroke="color-mix(in srgb, var(--primary-text-color) 12%, transparent)" stroke-width="14" stroke-linecap="round"/><path d="M30 130 A70 70 0 0 1 120 28" fill="none" stroke="var(--state-climate-heat-color)" stroke-width="14" stroke-linecap="round"/></svg>
+          <span class="big">21.5°</span><small>Heating · now 20.1 °C</small>
+          <div class="modes"><span class="sel"><ha-icon icon="mdi:fire"></ha-icon></span><span><ha-icon icon="mdi:snowflake"></ha-icon></span><span><ha-icon icon="mdi:power"></ha-icon></span></div>
+        </ha-card>
+        <ha-card class="media">
+          <div class="t"><span class="art"><ha-icon icon="mdi:music-box-multiple"></ha-icon></span><span class="info"><b>Evening Light</b><small>Kitchen speaker</small></span></div>
+          <div class="bar"><i></i></div>
+          <div class="ctl"><ha-icon icon="mdi:chevron-up" style="transform:rotate(-90deg)"></ha-icon><ha-icon icon="mdi:pause"></ha-icon><ha-icon icon="mdi:chevron-up" style="transform:rotate(90deg)"></ha-icon></div>
+        </ha-card>
+        <div class="row2">
+          <ha-card class="button" style="--c:var(--state-light-active-color)"><ha-icon icon="mdi:lightbulb-on"></ha-icon><span>Reading lamp</span></ha-card>
+          <ha-card class="button" style="--c:var(--state-icon-color)"><ha-icon icon="mdi:robot-vacuum"></ha-icon><span>Vacuum</span></ha-card>
+        </div>
+        <ha-card class="btns"><span class="btn">Arm home</span><span class="btn plain">Cancel</span><span class="link">Show history</span></ha-card>
+      </div>
+
+      <div class="section" id="ours">
+        <h2>Our cards</h2>
+      </div>
+
+      <div class="dialog-stage">
+        <div class="bg"></div>
+        <div class="under">
+          <ha-card class="tile" style="--tile-color:var(--state-light-active-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:lightbulb-on"></ha-icon></span><span class="info"><b>Ceiling light</b><small>On</small></span></div></ha-card>
+          <ha-card class="tile" style="--tile-color:var(--state-lock-locked-color)"><div class="top"><span class="ti"><ha-icon icon="mdi:lock"></ha-icon></span><span class="info"><b>Front door</b><small>Locked</small></span></div></ha-card>
+          <ha-card class="tile off"><div class="top"><span class="ti"><ha-icon icon="mdi:fan-off"></ha-icon></span><span class="info"><b>Bedroom fan</b><small>Off</small></span></div></ha-card>
+        </div>
+        <div class="scrim"></div>
+        <div class="dialog" role="dialog" aria-label="Ceiling light">
+          <header><ha-icon icon="mdi:lightbulb-on" style="color:var(--state-light-active-color)"></ha-icon>Ceiling light</header>
+          <small style="color:var(--secondary-text-color)">On · 70% · changed 12 minutes ago</small>
+          <div class="slider"><i></i></div>
+          <footer><span class="btn plain">History</span><span class="btn">Done</span></footer>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { applyPulseTheme, THEME_NAMES } from "./apply-theme.mjs";
+  const q = new URLSearchParams(location.search);
+  const dark = q.has("dark");
+  const lang = q.get("lang") || "en";
+  const which = (q.get("theme") || "pulse").toLowerCase();
+  document.documentElement.classList.toggle("dark", dark);
+  if (q.get("width")) { const f = document.getElementById("frame"); f.style.width = `${+q.get("width")}px`; f.style.border = "1px solid var(--divider-color)"; }
+
+  // ---- apply the theme like HA: base variables, then the mode's, as inline styles on <html>
+  const names = THEME_NAMES;
+  if (which !== "none") await applyPulseTheme(which, dark);
+  document.title = `${names[which] ?? "HA default"} · ${dark ? "dark" : "light"} · ${lang}`;
+
+  // ---- one invented home for all three cards
+  const now = Date.now();
+  const ago = (m) => new Date(now - m * 60000).toISOString();
+  const states = {}, entities = {};
+  const add = (entity_id, state, attributes = {}, mins = 5, reg = {}) => {
+    states[entity_id] = { entity_id, state, attributes, last_changed: ago(mins), last_updated: ago(mins) };
+    entities[entity_id] = { entity_id, ...reg };
+  };
+  const A = { area_id: "living" };
+  add("binary_sensor.living_presence", "on", { friendly_name: "Living Room Presence", device_class: "occupancy" }, 120, A);
+  add("sensor.living_temperature", "24.6", { friendly_name: "Living Room Temperature", device_class: "temperature", unit_of_measurement: "°C" }, 5, A);
+  add("sensor.living_humidity", "31", { friendly_name: "Living Room Humidity", device_class: "humidity", unit_of_measurement: "%" }, 5, A);
+  add("light.living_ceiling", "on", { friendly_name: "Living Room Ceiling", color_temp_kelvin: 2700, brightness: 200, supported_color_modes: ["color_temp"] }, 40, A);
+  add("light.living_lamp", "on", { friendly_name: "Floor Lamp", brightness: 120, supported_color_modes: ["brightness"] }, 40, A);
+  add("light.living_strip", "off", { friendly_name: "LED Strip", supported_color_modes: ["rgb"] }, 300, A);
+  add("binary_sensor.living_window", "on", { friendly_name: "Living Room Window", device_class: "window" }, 34, A);
+  add("media_player.living_tv", "playing", { friendly_name: "Living Room TV", media_title: "Evening Light" }, 8, A);
+  add("cover.living_blinds", "open", { friendly_name: "Living Room Blinds" }, 200, A);
+  add("switch.living_plug", "on", { friendly_name: "TV Plug", device_class: "outlet" }, 180, A);
+  add("climate.living_ac", "heat", { friendly_name: "Living Room AC", hvac_action: "heating", temperature: 23 }, 20, A);
+  add("person.alex", "home", { friendly_name: "Alex" });
+  add("person.sam", "home", { friendly_name: "Sam" });
+  add("sun.sun", "below_horizon", { friendly_name: "Sun" });
+  add("weather.home", "clear-night", { friendly_name: "Home", temperature: 14, temperature_unit: "°C" });
+  add("alarm_control_panel.house", "armed_home", { friendly_name: "House alarm", code_format: null, supported_features: 3 }, 95);
+  add("lock.front", "locked", { friendly_name: "Front Door Lock" }, 30);
+  add("binary_sensor.kitchen_leak", "off", { friendly_name: "Kitchen Sink Leak", device_class: "moisture" }, 600, { area_id: "kitchen" });
+
+  let n = 0;
+  const item = (name, extra) => ({ id: `i${++n}`, name, quantity: 1, unit: "pcs", category: "food", location: "pantry", expiry: null, min_quantity: null,
+    restock_quantity: null, auto_shop: true, notes: null, icon: null, created: "", updated: "", shopping: null, shopping_dismissed: false, ...extra });
+  const day = (d) => { const x = new Date(); x.setDate(x.getDate() + d); return x.toISOString().slice(0, 10); };
+  const items = [
+    item("Coffee beans", { quantity: 0, unit: "pack", min_quantity: 0, shopping: { uid: "u1", summary: "Coffee beans", amount: 1, auto: true } }),
+    item("Milk", { quantity: 1, unit: "bottle", category: "drinks", location: "fridge", min_quantity: 1, expiry: day(2) }),
+    item("Basmati rice", { quantity: 3, unit: "bag" }),
+    item("Greek yoghurt", { quantity: 2, location: "fridge", expiry: day(-1) }),
+  ];
+  const snap = () => ({ entry_id: "e1", title: "Home", version: "0.1.0", items,
+    settings: { shopping_list: "todo.shopping_list", auto_add: true, auto_restock: true, expiring_days: 3 },
+    units: ["pcs", "pack", "bottle", "bag"], locations: ["pantry", "fridge"], categories: ["food", "drinks"] });
+
+  const fmt = (s) => {
+    const u = s.attributes.unit_of_measurement;
+    if (u) return `${s.state} ${u}`;
+    const el = { on: "Ενεργό", off: "Ανενεργό", playing: "Αναπαραγωγή", home: "Σπίτι", locked: "Κλειδωμένη", armed_home: "Οπλισμένο (σπίτι)", "clear-night": "Αίθριος", open: "Ανοιχτό" };
+    const en = { on: "On", off: "Off", playing: "Playing", home: "Home", locked: "Locked", armed_home: "Armed home", "clear-night": "Clear", open: "Open", heat: "Heat" };
+    return (lang === "el" ? el : en)[s.state] ?? s.state;
+  };
+  const hass = {
+    states, entities, devices: {},
+    areas: { living: { area_id: "living", name: lang === "el" ? "Σαλόνι" : "Living Room", icon: "mdi:sofa" }, kitchen: { area_id: "kitchen", name: "Kitchen", icon: "mdi:stove" } },
+    user: { name: "Alex" }, language: lang, locale: { language: lang, time_format: "24" }, themes: { darkMode: dark },
+    callService: async () => {}, formatEntityState: fmt,
+    connection: { subscribeMessage: async (cb) => { setTimeout(() => cb(snap()), 30); return () => {}; } },
+    callWS: async (msg) => {
+      if (msg.type === "config/label_registry/list") return [];
+      if (msg.type === "stock_pulse/inventories") return [{ entry_id: "e1", title: "Home" }];
+      return null;
+    },
+  };
+
+  // ---- our cards, loaded from their repos
+  const ours = document.getElementById("ours");
+  const load = async (path, tag, config, cap) => {
+    try { await import(path); } catch (e) { ours.insertAdjacentHTML("beforeend", `<div class="cap">${cap}: bundle not found (${path})</div>`); return; }
+    await customElements.whenDefined(tag);
+    const card = document.createElement(tag);
+    card.setConfig(config);
+    card.hass = hass;
+    ours.appendChild(card);
+  };
+  await load("../../home-pulse-card/dist/home-pulse-card.js", "home-pulse-card", { type: "custom:home-pulse-card", shortcuts: [
+    { name: "Lights", icon: "mdi:lightbulb-group", navigation_path: "lights", badge: "lights" },
+    { name: "Security", icon: "mdi:shield-half-full", navigation_path: "security" },
+    { name: "Shopping", icon: "mdi:cart-outline", navigation_path: "shopping" }] }, "Home Pulse");
+  await load("../../area-pulse-card/dist/area-pulse-card.js", "area-pulse-card", { type: "custom:area-pulse-card", area: "living", actions: [{ preset: "lights_toggle" }, { preset: "everything_off" }] }, "Area Pulse");
+  await load("../../stock-pulse/custom_components/stock_pulse/frontend/stock-pulse-card.js", "stock-pulse-card", { type: "custom:stock-pulse-card", group_by: "none" }, "Stock Pulse");
+  window.previewReady = true;
+</script>
+</body>
+</html>

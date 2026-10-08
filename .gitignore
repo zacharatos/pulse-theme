@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+# a throwaway Home Assistant config used for testing (see AGENTS.md)
+ha-test/

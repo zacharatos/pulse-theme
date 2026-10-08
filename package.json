@@ -1,0 +1,13 @@
+{
+  "name": "pulse-theme",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pulse: a calm theme family for Home Assistant (Pulse, Pulse Glass, Pulse Tonal) and the shared design tokens of the Pulse cards.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "node scripts/build-theme.mjs",
+    "contrast": "node scripts/contrast.mjs",
+    "check": "node scripts/build-theme.mjs && node scripts/contrast.mjs"
+  }
+}
