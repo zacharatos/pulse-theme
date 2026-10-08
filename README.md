@@ -7,7 +7,7 @@ A calm theme family for Home Assistant. Neutral surfaces, one accent, and colour
 | | Light | Dark |
 | :- | :- | :- |
 | **Pulse**: matte, warm stone and linen greys, hairline edges (plus a soft shadow in light mode), dusk-blue accent | ![Pulse light](docs/pulse-light.png) | ![Pulse dark](docs/pulse-dark.png) |
-| **Pulse Glass**: frosted cards with a lit rim, floating over soft fields of colour, inspired by visionOS | ![Pulse Glass light](docs/glass-light.png) | ![Pulse Glass dark](docs/glass-dark.png) |
+| **Pulse Glass**: frosted cards with a lit rim, floating over a quiet, finely grained background, inspired by visionOS | ![Pulse Glass light](docs/glass-light.png) | ![Pulse Glass dark](docs/glass-dark.png) |
 | **Pulse Tonal**: filled mauve cards on a clean page, rounder shapes, rounded-square tile icons, inspired by Material You | ![Pulse Tonal light](docs/tonal-light.png) | ![Pulse Tonal dark](docs/tonal-dark.png) |
 
 ## Features
@@ -56,7 +56,7 @@ You can also give a single dashboard view its own theme: edit the view and pick 
 
 ## Accessibility
 
-Contrast is measured, not eyeballed: 80–81 pairs per variation and mode, covering text on cards, page, chips, dialogs, header and sidebar; text on buttons; and every state colour as an icon on its tile tint and on a chip, plus as text where it's used as text. For Pulse Glass, every pair is measured against the worst case: the frosted card over each colour of the gradient.
+Contrast is measured, not eyeballed: 80–81 pairs per variation and mode, covering text on cards, page, chips, dialogs, header and sidebar; text on buttons; and every state colour as an icon on its tile tint and on a chip, plus as text where it's used as text. For Pulse Glass, every pair is measured against the worst case: the frosted card over each colour stop of the background.
 
 **One deliberate exception.** In light mode, lights use a bright gold that reaches about 2.6:1 on a card and 2.2:1 on its own tile tint, below the 3:1 minimum for icons. Every yellow that reaches 3:1 on a light background looks mustard or brown. A light's state is always also written as text ("On · 70%"), so colour is never the only signal. In dark mode, lights pass normally.
 
@@ -67,7 +67,7 @@ A theme can only set variables that Home Assistant exposes. It can't change:
 - A light's real colour on tiles and in more-info. That's intended: it's meaningful colour.
 - Icons, layout and density of the built-in cards, and HA's own animations.
 - The coloured icons in the Settings menu, brand images and logos (HA hard-codes them).
-- The background of a view that has its own background set in the dashboard editor (your choice wins over Pulse Glass's gradient).
+- The background of a view that has its own background set in the dashboard editor (your choice wins over Pulse Glass's background).
 - Motion and other "detected" sensors. They use HA's generic *active* colour, which is the lights' gold. To change that, override `state-binary_sensor-motion-on-color` (or any other `state-<domain>-<device_class>-<state>-color`) in your own copy of the theme.
 - **On Home Assistant 2025.x:** feature bars keep a fixed 12px radius (same value anyway), tile icons stay circles in Pulse Tonal, and buttons and switches follow `primary-color` through the older component styles.
 

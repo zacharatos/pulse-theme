@@ -123,7 +123,7 @@ Lights use bright gold in light mode (`pulse-active`, `amber-color`): about 2.6:
 
 ### Pulse Glass
 
-- The gradient (`lovelace-background`) is pure CSS. Its colour stops are what the contrast check composites the frosted card over, so editing the gradient changes contrast: run the check.
+- The background (`lovelace-background`) is pure CSS: a fine grain (an inline, percent-encoded SVG noise tile from `grain()` in `scripts/palette.mjs`, nothing downloaded), one soft pool of light at the top and a neutral base gradient. No colour fields: behind translucent cards they made cards look stateful (a red-orange card read as a problem). The hex colour stops are what the contrast check composites the frosted card over, so editing them changes contrast: run the check. The grain is left out of the check; the card's blur averages it away.
 - Blur (`ha-card-backdrop-filter`, `app-header-backdrop-filter`, `ha-dialog-surface-backdrop-filter`) is the theme's only performance cost. Don't add more blurred surfaces. If old tablets stutter, the agreed fallback is a fourth theme, "Pulse Glass Lite", with the same values and no blur.
 - The sidebar can't blur, so it uses the page colour, not a translucent one.
 
@@ -148,7 +148,7 @@ The harness applies the theme exactly like HA, but its native cards are look-ali
 - The real dashboards, more-info dialogs, settings pages, the energy dashboard, the map and the history graphs, in all three themes, light and dark.
 - His phone (Companion app): status bar colour, safe areas, the font (SF on iOS).
 - Pulse Glass on his wall tablet or oldest device: smooth scrolling?
-- A view with its own background set (should win over Glass's gradient).
+- A view with its own background set (should win over Glass's background).
 - Custom cards he uses that aren't ours.
 - After an HA update: buttons, switches and checkboxes still follow the accent (the newer design tokens group).
 

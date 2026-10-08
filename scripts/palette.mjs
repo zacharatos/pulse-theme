@@ -28,6 +28,16 @@ export const SYSTEM_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "S
  *  Per mode: neutral [hue, chroma] and lightness of page / card / section, accent [hue, chroma],
  *  border width, card shadow, and chip fill ({ on: "text" | "accent" | "white", alpha }).
  */
+/**
+ * Pulse Glass's grain: a tiny inline SVG noise tile (no download), tinted `rgb` 0–1 and as strong as `alpha`.
+ * Percent-encoded so it sits unquoted in url() and in the YAML string.
+ */
+function grain(rgb, alpha) {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 ${rgb} 0 0 0 0 ${rgb} 0 0 0 0 ${rgb} ${alpha} 0 0 0 0'/></filter><rect width='160' height='160' filter='url(%23g)'/></svg>`;
+  const data = encodeURIComponent(svg).replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29").replace(/%2523/g, "%23");
+  return `url(data:image/svg+xml,${data}) repeat`;
+}
+
 const STONE_LIGHT_SHADOW = "0 1px 2px rgba(40, 30, 20, 0.05), 0 4px 16px -4px rgba(40, 30, 20, 0.07)";
 export const VARIATIONS = [
   {
@@ -41,7 +51,9 @@ export const VARIATIONS = [
       border: 1, shadow: STONE_LIGHT_SHADOW, chip: { on: "text", alpha: 0.065 } },
   },
   {
-    // Pulse Glass: visionOS-like. Frosted panels with a light rim and a soft drop shadow, floating over colour fields.
+    // Pulse Glass: visionOS-like. Frosted panels with a light rim and a soft drop shadow, over a quiet textured
+    // background: a fine grain on a neutral base with one soft pool of light at the top. No colour fields, so a
+    // card's tint never reads as a state.
     key: "glass", name: "Pulse Glass",
     shape: { radius: 20, control: 14, tileIcon: null },
     font: SYSTEM_FONT,
@@ -51,7 +63,7 @@ export const VARIATIONS = [
       shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 12px 32px -12px rgba(0, 0, 0, 0.65)",
       glass: {
         alpha: 0.075, blur: "blur(26px) saturate(180%)",
-        background: "radial-gradient(55% 45% at 12% 8%, #4c3278 0%, transparent 70%), radial-gradient(45% 40% at 88% 22%, #27427a 0%, transparent 70%), radial-gradient(50% 45% at 78% 92%, #683528 0%, transparent 70%), radial-gradient(40% 38% at 18% 88%, #1e5054 0%, transparent 70%), linear-gradient(160deg, #11121d 0%, #171526 50%, #12161f 100%) fixed",
+        background: `${grain(1, 0.15)}, radial-gradient(90% 60% at 50% -10%, #2b2c3c 0%, transparent 70%), linear-gradient(170deg, #17171f 0%, #1b1b25 55%, #141419 100%) fixed`,
       },
     },
     light: {
@@ -60,7 +72,7 @@ export const VARIATIONS = [
       shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 12px 32px -14px rgba(70, 50, 100, 0.3)",
       glass: {
         alpha: 0.5, blur: "blur(26px) saturate(180%)",
-        background: "radial-gradient(55% 45% at 10% 6%, #f6c3a3 0%, transparent 70%), radial-gradient(48% 42% at 90% 18%, #c9baf0 0%, transparent 70%), radial-gradient(52% 46% at 80% 90%, #b6d6f2 0%, transparent 70%), radial-gradient(42% 40% at 15% 86%, #c3e7d3 0%, transparent 70%), linear-gradient(165deg, #f4ece6 0%, #ece8f3 55%, #e5eef3 100%) fixed",
+        background: `${grain(0, 0.16)}, radial-gradient(90% 60% at 50% -10%, #fbfaf8 0%, transparent 70%), linear-gradient(170deg, #f1eeea 0%, #eae8ec 55%, #e6e5e9 100%) fixed`,
       },
     },
   },
