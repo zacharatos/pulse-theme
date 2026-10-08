@@ -1,0 +1,33 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hacs/action@main
+        with:
+          category: theme
+  theme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Theme file is up to date with the palette
+        run: |
+          node scripts/build-theme.mjs
+          git diff --exit-code themes/
+      - name: Contrast meets WCAG AA
+        run: node scripts/contrast.mjs
+      - name: Theme file is valid YAML
+        run: |
+          pip install --quiet pyyaml
+          python -c "import yaml; t = yaml.safe_load(open('themes/pulse.yaml')); assert set(t) == {'Pulse', 'Pulse Glass', 'Pulse Tonal'}, t.keys(); print('ok:', ', '.join(t))"
