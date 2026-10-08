@@ -20,40 +20,60 @@ const PALETTE = {
 const DARK_L = { bad: 0.7, warn: 0.79, warm: 0.75, active: 0.85, ok: 0.8, info: 0.78, cold: 0.78, humid: 0.78, dry: 0.82 };
 // Tokens our cards also use as text (4.5:1); the others colour icons and fills only (3:1).
 export const TEXT_TOKENS = new Set(["ok", "info", "warn", "bad", "cold", "warm", "dry", "humid"]);
-// Light-mode chip fill (share of the text colour) and dark-mode chip fill.
-export const CHIP_FILL = { light: 0.05, dark: 0.07 };
 
 export const SYSTEM_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI", Roboto, Noto, sans-serif';
 
-/** The three variations. `name` is what HA shows in the theme picker. */
+/** The three variations. `name` is what HA shows in the theme picker.
+ *  shape: corner radii and tile-icon shape; font: the font stack.
+ *  Per mode: neutral [hue, chroma] and lightness of page / card / section, accent [hue, chroma],
+ *  border width, card shadow, and chip fill ({ on: "text" | "accent" | "white", alpha }).
+ */
+const STONE_LIGHT_SHADOW = "0 1px 2px rgba(40, 30, 20, 0.05), 0 4px 16px -4px rgba(40, 30, 20, 0.07)";
 export const VARIATIONS = [
   {
+    // Pulse: matte and precise. Warm stone neutrals, hairline edges; in light mode a soft shadow for depth.
     key: "stone", name: "Pulse",
-    shape: { control: 12, tileIcon: null, border: 1, shadow: "none" },
-    dark: { neutral: [70, 0.008], L: { bg: 0.17, card: 0.215, section: 0.245 }, accent: [272, 0.075], divider: "rgba(240, 236, 228, 0.09)" },
-    light: { neutral: [75, 0.008], L: { bg: 0.962, card: 0.995, section: 0.93 }, cardChroma: 0.3, accent: [272, 0.085], divider: "rgba(40, 36, 30, 0.09)", statePrefer: 0.68 },
+    shape: { radius: 16, control: 12, tileIcon: null },
+    font: SYSTEM_FONT,
+    dark: { neutral: [70, 0.006], L: { bg: 0.165, card: 0.215, section: 0.245 }, accent: [272, 0.075], divider: "rgba(240, 236, 228, 0.09)",
+      border: 1, shadow: "none", chip: { on: "text", alpha: 0.07 } },
+    light: { neutral: [75, 0.009], L: { bg: 0.948, card: 0.998, section: 0.92 }, cardChroma: 0.25, accent: [272, 0.085], divider: "rgba(40, 36, 30, 0.07)", statePrefer: 0.68,
+      border: 1, shadow: STONE_LIGHT_SHADOW, chip: { on: "text", alpha: 0.065 } },
   },
   {
+    // Pulse Glass: visionOS-like. Frosted panels with a light rim and a soft drop shadow, floating over colour fields.
     key: "glass", name: "Pulse Glass",
-    shape: { control: 12, tileIcon: null, border: 0, shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.08)" },
+    shape: { radius: 20, control: 14, tileIcon: null },
+    font: SYSTEM_FONT,
     dark: {
       neutral: [285, 0.02], L: { bg: 0.16, card: 0.24, section: 0.22 }, accent: [272, 0.09], divider: "rgba(255, 255, 255, 0.08)",
+      border: 0, chip: { on: "white", alpha: 0.09 },
+      shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 12px 32px -12px rgba(0, 0, 0, 0.65)",
       glass: {
-        alpha: 0.07, blur: "blur(22px) saturate(150%)", background: "radial-gradient(120% 80% at 10% 0%, #3a2a52 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, #4a2a28 0%, transparent 60%), linear-gradient(160deg, #15172a 0%, #1d1a2c 50%, #171b24 100%) fixed",
+        alpha: 0.075, blur: "blur(26px) saturate(180%)",
+        background: "radial-gradient(55% 45% at 12% 8%, #4c3278 0%, transparent 70%), radial-gradient(45% 40% at 88% 22%, #27427a 0%, transparent 70%), radial-gradient(50% 45% at 78% 92%, #683528 0%, transparent 70%), radial-gradient(40% 38% at 18% 88%, #1e5054 0%, transparent 70%), linear-gradient(160deg, #11121d 0%, #171526 50%, #12161f 100%) fixed",
       },
     },
     light: {
       neutral: [60, 0.012], L: { bg: 0.94, card: 0.98, section: 0.95 }, accent: [272, 0.1], divider: "rgba(60, 40, 60, 0.08)", statePrefer: 0.64,
+      border: 0, chip: { on: "white", alpha: 0.55 },
+      shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 12px 32px -14px rgba(70, 50, 100, 0.3)",
       glass: {
-        alpha: 0.6, blur: "blur(22px) saturate(160%)", background: "radial-gradient(110% 80% at 0% 0%, #f6cfb4 0%, transparent 55%), radial-gradient(100% 80% at 100% 20%, #d8cdf0 0%, transparent 60%), linear-gradient(170deg, #f4e9df 0%, #e6e3f1 55%, #dbe7ef 100%) fixed",
+        alpha: 0.5, blur: "blur(26px) saturate(180%)",
+        background: "radial-gradient(55% 45% at 10% 6%, #f6c3a3 0%, transparent 70%), radial-gradient(48% 42% at 90% 18%, #c9baf0 0%, transparent 70%), radial-gradient(52% 46% at 80% 90%, #b6d6f2 0%, transparent 70%), radial-gradient(42% 40% at 15% 86%, #c3e7d3 0%, transparent 70%), linear-gradient(165deg, #f4ece6 0%, #ece8f3 55%, #e5eef3 100%) fixed",
       },
     },
   },
   {
+    // Pulse Tonal: Material You-like. Rounder and borderless; filled tonal cards on a clean page (the inverse of
+    // Pulse's white cards on stone), with light pills on the cards in light mode and accent-tinted ones in dark.
     key: "tonal", name: "Pulse Tonal",
-    shape: { control: 14, tileIcon: "12px", border: 0, shadow: "0 1px 2px rgba(0, 0, 0, 0.06)" },
-    dark: { neutral: [345, 0.014], L: { bg: 0.165, card: 0.215, section: 0.245 }, cardChroma: 1.4, accent: [345, 0.085], divider: "rgba(255, 230, 240, 0.07)" },
-    light: { neutral: [345, 0.012], L: { bg: 0.965, card: 0.99, section: 0.935 }, cardChroma: 0.6, accent: [345, 0.1], divider: "rgba(60, 30, 45, 0.07)", statePrefer: 0.66 },
+    shape: { radius: 24, control: 16, tileIcon: "14px" },
+    font: '"SF Pro Rounded", ui-rounded, ' + SYSTEM_FONT,
+    dark: { neutral: [345, 0.022], L: { bg: 0.135, card: 0.235, section: 0.17 }, cardChroma: 1.9, accent: [345, 0.085], divider: "rgba(255, 230, 240, 0.06)",
+      border: 0, shadow: "none", chip: { on: "accent", alpha: 0.16 } },
+    light: { neutral: [345, 0.022], L: { bg: 0.985, card: 0.938, section: 0.96 }, cardChroma: 1.5, accent: [345, 0.1], divider: "rgba(60, 30, 45, 0.07)", statePrefer: 0.6,
+      border: 0, shadow: "none", chip: { on: "white", alpha: 0.62 } },
   },
 ];
 
@@ -76,14 +96,21 @@ export function derive(v, mode) {
   // What text actually sits on: the solid card, or (Glass) the frosted card over each background stop.
   // Glass: every colour stop of the background gradient, so the check matches what HA paints.
   m.surfaces = m.glass ? m.glass.background.match(/#[0-9a-f]{6}/gi).map((stop) => mix("#ffffff", stop, m.glass.alpha)) : [m.card];
-  m.chipFill = dark ? CHIP_FILL.dark : CHIP_FILL.light;
+  m.chipFill = s.chip.alpha;
   const onAll = (min) => [(h) => Math.min(...m.surfaces.map((x) => ratio(h, x))), min];
-  const onChips = (min) => [(h) => Math.min(...m.surfaces.map((x) => ratio(h, mix(m.text, x, m.chipFill)))), min];
+  // Chip colour is decided after the accent; until then text-tinted chips stand in for the check below.
+  m.chipBase = s.chip.on === "white" ? "#ffffff" : m.text;
+  const onChips = (min) => [(h) => Math.min(...m.surfaces.map((x) => ratio(h, mix(m.chipBase, x, m.chipFill)))), min];
   m.text2 = solve(nC * 0.8, nH, [onAll(4.6), onChips(4.6), [(h) => ratio(h, m.bg), 4.6]], dark, dark ? 0.72 : 0.5);
   m.disabled = hex(dark ? 0.5 : 0.72, nC, nH);
   const [aH, aC] = s.accent;
   m.accent = solve(aC, aH, [onAll(4.6), ...(dark ? [] : [[(h) => ratio("#ffffff", h), 4.6]])], dark, dark ? 0.78 : 0.5);
   m.onAccent = dark ? hex(0.2, 0.03, aH) : "#ffffff";
+  if (s.chip.on === "accent") {
+    m.chipBase = m.accent;
+    // Re-check secondary text on the accent-tinted chips (darker/lighter if needed).
+    m.text2 = solve(nC * 0.8, nH, [onAll(4.6), onChips(4.6), [(h) => ratio(h, m.bg), 4.6]], dark, dark ? 0.72 : 0.5);
+  }
   // Accent scale for HA's newer components (buttons, switches, checkboxes).
   m.primary = Object.fromEntries(Object.entries(PRIMARY_L).map(([k, L]) => [k, hex(L, aC * Math.min(1, (1 - L) / 0.25, L / 0.35), aH)]));
   m.primary[40] = solve(aC, aH, [[(h) => ratio("#ffffff", h), 4.6]], false, 0.52);
@@ -98,9 +125,12 @@ export function derive(v, mode) {
   // Lights in light mode: bright gold, a deliberate exception below 3:1 (decision 0001). Must stay ≥ 2.5:1 on the card.
   if (!dark) m.active = solve(0.17, 82, [onAll(2.6)], false, 0.8);
   m.palette = Object.fromEntries(Object.entries(PALETTE).map(([k, val]) => [k, typeof val === "string" ? m[val] : state(val, false, k)]));
-  m.glowDay = hex(dark ? 0.82 : 0.8, 0.12, 80);
+  // Light mode: a softer, more golden glow; on white a warm tint otherwise reads as a stain.
+  m.glowDay = dark ? hex(0.82, 0.12, 80) : hex(0.86, 0.09, 88);
   m.glowNight = hex(dark ? 0.72 : 0.62, 0.1, 280);
-  m.glowAlpha = dark ? 0.14 : 0.16;
+  m.glowAlpha = dark ? 0.14 : 0.1;
   m.divider = s.divider;
+  m.border = s.border;
+  m.shadow = s.shadow;
   return m;
 }

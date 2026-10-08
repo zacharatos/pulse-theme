@@ -10,16 +10,14 @@ const rgba = (h, a) => `rgba(${rgb(h).join(", ")}, ${a})`;
 /** Mode-independent variables: shape, type, rhythm. */
 function base(v) {
   const g = [];
-  g.push(["Shape: 16px cards, family control radius", {
-    "ha-card-border-radius": "16px",
-    "ha-card-border-width": `${v.shape.border}px`,
-    "ha-card-box-shadow": v.shape.shadow,
+  g.push([`Shape: ${v.shape.radius}px cards, ${v.shape.control}px controls`, {
+    "ha-card-border-radius": `${v.shape.radius}px`,
     "ha-card-features-border-radius": `${v.shape.control}px`,
     ...(v.shape.tileIcon ? { "ha-tile-icon-border-radius": v.shape.tileIcon } : {}),
   }]);
-  g.push(["Type: the device's own system font, nothing to download", { "ha-font-family-body": SYSTEM_FONT }]);
+  g.push([v.font === SYSTEM_FONT ? "Type: the device's own system font, nothing to download" : "Type: a rounded system font where the device has one (Apple), else the system font; nothing to download", { "ha-font-family-body": v.font }]);
   g.push(["Pulse tokens: shape and rhythm (read by our cards; see README)", {
-    "pulse-radius": "16px",
+    "pulse-radius": `${v.shape.radius}px`,
     "pulse-control-radius": `${v.shape.control}px`,
     "pulse-chip-height": "30px",
     "pulse-gap": "12px",
@@ -39,6 +37,7 @@ function mode(v, m) {
   const glass = m.glass;
   const cardBg = glass ? rgba("#ffffff", glass.alpha) : m.card;
   const solidCard = m.surfaces[0];
+  g.push(["Card edge and depth", { "ha-card-border-width": `${m.border}px`, "ha-card-box-shadow": m.shadow }]);
   g.push(["Surfaces and text", {
     "primary-background-color": m.bg,
     "secondary-background-color": m.section,
@@ -100,9 +99,9 @@ function mode(v, m) {
   g.push(["Pulse tokens: colour (read by our cards; HA also derives --rgb-pulse-* from each hex)", {
     "pulse-accent": m.accent,
     "pulse-on-accent": m.onAccent,
-    "pulse-surface-neutral": rgba(m.text, m.chipFill),
-    "pulse-surface-neutral-hover": rgba(m.text, +(m.chipFill + 0.04).toFixed(2)),
-    "pulse-surface-neutral-strong": rgba(m.text, +(m.chipFill + 0.08).toFixed(2)),
+    "pulse-surface-neutral": rgba(m.chipBase, m.chipFill),
+    "pulse-surface-neutral-hover": rgba(m.chipBase, +(m.chipFill + 0.04).toFixed(3)),
+    "pulse-surface-neutral-strong": rgba(m.chipBase, +(m.chipFill + 0.08).toFixed(3)),
     "pulse-ok": m.ok, "pulse-info": m.info, "pulse-warn": m.warn, "pulse-bad": m.bad, "pulse-active": m.active,
     "pulse-cold": m.cold, "pulse-warm": m.warm, "pulse-dry": m.dry, "pulse-humid": m.humid,
     "pulse-glow-day": m.glowDay, "pulse-glow-night": m.glowNight, "pulse-glow-alpha": String(m.glowAlpha),

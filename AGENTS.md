@@ -58,6 +58,7 @@ Don't write a commit message unless he asks for one. If he does, offer it as a s
 | `scripts/yaml.mjs` | Parser for the small YAML subset the theme file uses (shared by the check and the preview). |
 | `test/apply-theme.mjs` | Applies a Pulse theme to a page the way HA does. Used by the preview and by the card harnesses' `?theme=` option. |
 | `test/ha/` | Throwaway Home Assistant: `run.sh`, `setup.py`, `configuration.yaml`, `shots.mjs`, README. |
+| `test/dashboard.html` | Browser harness: a whole dashboard laid out like a real home (greeting, alarm, Home Pulse, three Area Pulse rooms, Stock Pulse) with the real card bundles. `?popup=living` opens a room popup; `?from=<other checkout>/test/apply-theme.mjs` shows an older release for comparison. |
 | `test/preview.html` | Browser harness: applies a theme like HA does, native-style mock cards plus the three real Pulse card bundles from their sibling repos. README screenshots come from it. |
 | `docs/*.png` | README screenshots (from the preview harness). |
 | `.github/workflows/validate.yml` | HACS action (category theme), generated file is up to date, contrast, YAML validity. |
@@ -72,7 +73,7 @@ npm run check      # both
 ```
 
 - Always rebuild after changing anything in `scripts/` and leave `themes/pulse.yaml` modified in the working tree. CI regenerates it and fails if the committed copy is stale.
-- **Look at it.** Serve the parent `Projects` folder (`python -m http.server 8765` there) and open `http://localhost:8765/pulse-theme/test/preview.html`. Query options: `?theme=pulse|glass|tonal|none`, `?dark=1`, `?lang=el`, `?width=380`. Check all three themes in light and dark, the phone width, and the console.
+- **Look at it.** Serve the parent `Projects` folder (`python -m http.server 8765` there) and open `http://localhost:8765/pulse-theme/test/preview.html`. Query options: `?theme=pulse|glass|tonal|none`, `?dark=1`, `?lang=el`, `?width=380`. Check all three themes in light and dark, the phone width, and the console. Then `test/dashboard.html` for the same change on a realistic dashboard, and with `?popup=living` for a dialog.
 - **Then check it in a throwaway Home Assistant**, never the live house: `bash test/ha/run.sh` (and `HA_VERSION=2025.7.4` for our minimum), then `npx -y -p playwright@1.56.1 node test/ha/shots.mjs`. Everything about it, including the packages a bare install misses, is in `test/ha/README.md`. Look at a sections view with native cards and the Pulse cards, a more-info dialog, the sidebar and a settings page, in light and dark, at phone width and in Greek.
 
 ## How we work on this theme

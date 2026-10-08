@@ -6,9 +6,9 @@ A calm theme family for Home Assistant. Neutral surfaces, one accent, and colour
 
 | | Light | Dark |
 | :- | :- | :- |
-| **Pulse**: matte, warm stone and linen greys, hairline edges, dusk-blue accent | ![Pulse light](docs/pulse-light.png) | ![Pulse dark](docs/pulse-dark.png) |
-| **Pulse Glass**: frosted cards over a soft dusk-to-ember gradient, inspired by visionOS | ![Pulse Glass light](docs/glass-light.png) | ![Pulse Glass dark](docs/glass-dark.png) |
-| **Pulse Tonal**: surfaces with a hint of warm mauve, rounded-square tile icons, inspired by Material You | ![Pulse Tonal light](docs/tonal-light.png) | ![Pulse Tonal dark](docs/tonal-dark.png) |
+| **Pulse**: matte, warm stone and linen greys, hairline edges (plus a soft shadow in light mode), dusk-blue accent | ![Pulse light](docs/pulse-light.png) | ![Pulse dark](docs/pulse-dark.png) |
+| **Pulse Glass**: frosted cards with a lit rim, floating over soft fields of colour, inspired by visionOS | ![Pulse Glass light](docs/glass-light.png) | ![Pulse Glass dark](docs/glass-dark.png) |
+| **Pulse Tonal**: filled mauve cards on a clean page, rounder shapes, rounded-square tile icons, inspired by Material You | ![Pulse Tonal light](docs/tonal-light.png) | ![Pulse Tonal dark](docs/tonal-dark.png) |
 
 ## Features
 
@@ -43,10 +43,13 @@ You can also give a single dashboard view its own theme: edit the view and pick 
 
 | | Pulse | Pulse Glass | Pulse Tonal |
 | :- | :- | :- | :- |
-| Surfaces | Warm stone greys, solid | Frosted, translucent over a gradient | Warm, with a hint of the accent |
+| Surfaces | White or dark cards on a warm stone page | Frosted, translucent over fields of colour | Cards filled with the accent tint on a near-plain page |
 | Accent | Dusk blue | Dusk blue | Warm mauve |
-| Card edges | 1px hairline, no shadow | No border, 1px inner highlight | No border, very soft shadow |
+| Shape | 16px cards, 12px controls | 20px cards, 14px controls | 24px cards, 16px controls |
+| Card edges | 1px hairline; soft shadow in light mode | No border: a lit top edge, a faint inner outline and a drop shadow | No border, no shadow: the fill carries the shape |
+| Chips and buttons | A share of the text colour | Frosted white | Light pills in light mode, accent-tinted in dark |
 | Tile icons | Circles | Circles | Rounded squares (HA 2026+) |
+| Font | Your device's | Your device's | Your device's rounded variant where there is one (Apple) |
 | Cost | None | Blur (see below) | None |
 
 **About Pulse Glass and older tablets.** Frosted glass is the one heavy thing a theme can do: the browser re-blurs everything behind every card while you scroll. Phones and PCs from the last few years handle it easily. An old wall tablet may stutter, so use Pulse or Pulse Tonal there. Each device can have its own theme in its profile.
@@ -83,7 +86,7 @@ Pulse exposes its decisions as `--pulse-*` CSS variables. Read them first, then 
 | Token | Meaning |
 | :- | :- |
 | `--pulse-accent`, `--pulse-on-accent` | The one accent, and text on an accent fill |
-| `--pulse-surface-neutral`, `-hover`, `-strong` | Fills for chips, rows and controls (a share of the text colour) |
+| `--pulse-surface-neutral`, `-hover`, `-strong` | Fills for chips, rows and controls (a share of the text colour; frosted white in Glass; white or accent-tinted in Tonal) |
 | `--pulse-ok` | All good: home, locked, armed, in stock |
 | `--pulse-info` | Information, cooling |
 | `--pulse-warn` | Needs a look: open, low, arming |
@@ -92,7 +95,7 @@ Pulse exposes its decisions as `--pulse-*` CSS variables. Read them first, then 
 | `--pulse-cold`, `--pulse-warm` | Temperature below or above range |
 | `--pulse-dry`, `--pulse-humid` | Humidity below or above range |
 | `--pulse-glow-day`, `--pulse-glow-night`, `--pulse-glow-alpha` | Sun and moon glows, and how strong a meaningful glow may be |
-| `--pulse-radius`, `--pulse-control-radius`, `--pulse-chip-height` | 16px cards, 12px controls (14px in Tonal), 30px pill chips |
+| `--pulse-radius`, `--pulse-control-radius`, `--pulse-chip-height` | Cards and controls: 16/12px in Pulse, 20/14px in Glass, 24/16px in Tonal; 30px pill chips |
 | `--pulse-gap`, `--pulse-pad`, `--pulse-row-height` | 12px, 12px, 56px |
 | `--pulse-motion-fast`, `-normal`, `-slow`, `--pulse-ease` | 150 / 250 / 350 ms and a calm easing curve |
 
@@ -112,6 +115,7 @@ npm run check      # both
 
 - `themes/pulse.yaml` is **generated**. Change colours in `scripts/palette.mjs`: each colour is a hue and chroma, and the solver finds the lightness that meets its contrast target. CI fails if the committed YAML is stale or any pair drops below AA.
 - `test/preview.html` applies the theme the way Home Assistant does and shows native-style cards next to the Pulse cards. Serve the folder that contains this repo and its sibling card repos, then open `pulse-theme/test/preview.html` (`?theme=pulse|glass|tonal|none`, `?dark=1`, `?lang=el`, `?width=380`). The screenshots above come from it.
+- `test/dashboard.html` is a whole dashboard laid out like a real home (greeting, alarm, Home Pulse, three Area Pulse rooms, Stock Pulse), for judging a change on the cards people actually use. Options: `?theme=`, `?dark=1`, `?width=390`, `?popup=living|bedroom|hall` (opens that room's popup) and `?from=<path to another checkout's test/apply-theme.mjs>` to see an older release on the same page.
 - `test/ha/` runs a throwaway Home Assistant with the demo integration and the Pulse cards, and takes screenshots of it (see `test/ha/README.md`).
 
 ## License

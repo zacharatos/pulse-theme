@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="data:," />
+<title>Pulse theme – dashboard harness</title>
+<!--
+  A dashboard laid out like a real home (greeting, badges, alarm, Home Pulse shortcuts and status, Stock Pulse,
+  three Area Pulse rooms), with the theme applied the way Home Assistant does. For judging a theme change on
+  the cards people actually use, not just a sampler. Same stubs and defaults as preview.html.
+
+  Serve the parent Projects folder so the sibling card repos are reachable:
+    cd C:\Users\Timos\Documents\Projects  &&  python -m http.server 8765
+    http://localhost:8765/pulse-theme/test/preview.html
+
+  Query options: ?theme=pulse|glass|tonal|none  ?dark=1  ?width=390 (phone)  ?popup=living|bedroom|hall (open that room's popup)
+    ?from=<path to another pulse-theme checkout's test/apply-theme.mjs> to compare against an older release
+  Entity names are invented. Screenshots for the README come from this page.
+-->
+<script src="../../area-pulse-card/test/icons.js"></script>
+<script>window.__MDI = { ...window.MDI };</script>
+<script src="../../home-pulse-card/test/icons.js"></script>
+<script>window.__MDI = { ...window.__MDI, ...window.MDI };</script>
+<script src="../../stock-pulse/test/icons.js"></script>
+<script>window.MDI = { ...window.__MDI, ...window.MDI };</script>
+<style>
+  /* Home Assistant's own defaults (frontend 2026.10, color.globals.ts), the base every theme layers on. */
+  :root {
+    --primary-text-color: #141414; --secondary-text-color: #5e5e5e; --disabled-text-color: #bdbdbd; --text-primary-color: #ffffff;
+    --primary-color: #009ac7; --accent-color: #ff9800; --divider-color: rgba(0, 0, 0, 0.12); --outline-color: rgba(0, 0, 0, 0.12);
+    --card-background-color: #ffffff; --primary-background-color: #fafafa; --secondary-background-color: #e5e5e5;
+    --state-icon-color: #44739e; --error-color: #db4437; --warning-color: #ffa600; --success-color: #43a047; --info-color: #039be5;
+    --red-color: #f44336; --pink-color: #e91e63; --purple-color: #926bc7; --indigo-color: #3f51b5; --blue-color: #2196f3;
+    --light-blue-color: #03a9f4; --cyan-color: #00bcd4; --teal-color: #009688; --green-color: #4caf50; --amber-color: #ffc107;
+    --orange-color: #ff9800; --deep-orange-color: #ff6f22; --grey-color: #9e9e9e; --disabled-color: #bdbdbd;
+    --ha-color-primary-30: #006787; --ha-color-primary-40: #009ac7; --ha-color-primary-60: #37c8fd;
+    --ha-font-family-body: Roboto, Noto, sans-serif;
+    /* derived, exactly as HA declares them */
+    --state-active-color: var(--amber-color); --state-inactive-color: var(--grey-color);
+    --state-light-active-color: var(--amber-color); --state-switch-active-color: var(--amber-color);
+    --state-binary_sensor-active-color: var(--amber-color); --state-binary_sensor-moisture-on-color: var(--red-color);
+    --state-climate-heat-color: var(--deep-orange-color); --state-climate-cool-color: var(--blue-color);
+    --state-lock-locked-color: var(--green-color); --state-lock-unlocked-color: var(--red-color);
+    --state-media_player-active-color: var(--light-blue-color); --state-person-home-color: var(--green-color);
+    --state-fan-active-color: var(--cyan-color); --state-cover-active-color: var(--purple-color);
+    --sidebar-text-color: var(--primary-text-color); --sidebar-background-color: var(--card-background-color);
+    --sidebar-selected-text-color: var(--primary-color); --sidebar-selected-icon-color: var(--primary-color);
+    --sidebar-icon-color: rgba(20, 20, 20, 0.6);
+    --app-header-text-color: var(--sidebar-text-color); --app-header-background-color: var(--sidebar-background-color);
+    --mdc-theme-surface: var(--card-background-color);
+  }
+  html.dark {
+    --primary-background-color: #111111; --card-background-color: #1c1c1c; --secondary-background-color: #282828;
+    --primary-text-color: #e1e1e1; --secondary-text-color: #9b9b9b; --disabled-text-color: #6f6f6f;
+    --divider-color: rgba(225, 225, 225, 0.12); --outline-color: rgba(225, 225, 225, 0.12); --sidebar-icon-color: rgba(225, 225, 225, 0.6);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: var(--ha-font-family-body); color: var(--primary-text-color); background: var(--primary-background-color); -webkit-font-smoothing: antialiased; font-size: 14px; }
+
+  /* ---- app chrome */
+  .app { display: flex; min-height: 100%; }
+  .frame { margin: 0 auto; }
+  .sidebar { width: 256px; flex: none; background: var(--sidebar-background-color); border-right: 1px solid var(--divider-color); padding: 8px; display: flex; flex-direction: column; gap: 2px; }
+  .sidebar .brand { height: 48px; display: flex; align-items: center; padding: 0 12px; font-size: 20px; color: var(--sidebar-text-color); }
+  .sidebar a { display: flex; align-items: center; gap: 16px; height: 40px; padding: 0 12px; border-radius: 12px; color: var(--sidebar-text-color); text-decoration: none; }
+  .sidebar a ha-icon { color: var(--sidebar-icon-color); }
+  .sidebar a.sel { color: var(--sidebar-selected-text-color); background: color-mix(in srgb, var(--sidebar-selected-icon-color) 12%, transparent); }
+  .sidebar a.sel ha-icon { color: var(--sidebar-selected-icon-color); }
+  main { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; }
+  .bg { position: absolute; inset: 0; background: var(--lovelace-background, var(--primary-background-color)); z-index: 0; }
+  .toolbar { position: sticky; top: 0; z-index: 2; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px;
+    background: var(--app-header-background-color); color: var(--app-header-text-color); border-bottom: 1px solid var(--divider-color);
+    backdrop-filter: var(--app-header-backdrop-filter, none); -webkit-backdrop-filter: var(--app-header-backdrop-filter, none); }
+  .toolbar .title { font-size: 20px; flex: 1; }
+  .toolbar .tabs { display: flex; gap: 4px; }
+  .toolbar .tab { padding: 6px 12px; border-radius: 99px; font-size: 14px; }
+  .toolbar .tab.sel { background: color-mix(in srgb, var(--primary-color) 14%, transparent); color: var(--primary-color); }
+  .view { position: relative; z-index: 1; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 24px 16px; align-items: start; }
+  .section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
+  .section h2 { margin: 4px 4px 0; font-size: 20px; font-weight: 400; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; grid-column: 1 / -1; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px 0 8px; border-radius: 18px; font-size: 13px;
+    background: var(--ha-card-background, var(--card-background-color)); border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--divider-color));
+    backdrop-filter: var(--ha-card-backdrop-filter, none); -webkit-backdrop-filter: var(--ha-card-backdrop-filter, none); }
+  .badge ha-icon { --mdc-icon-size: 18px; color: var(--c); }
+  .badge small { color: var(--secondary-text-color); }
+
+  /* ---- native-style cards (look of hui-tile-card and friends, driven by the same variables) */
+  .tile { display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+  .tile .top { display: flex; align-items: center; gap: 10px; }
+  .ti { position: relative; width: 36px; height: 36px; flex: none; display: grid; place-items: center; color: var(--tile-color);
+    border-radius: var(--ha-tile-icon-border-radius, 50%); }
+  .ti::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--tile-color); opacity: 0.2; }
+  .tile.off .ti { color: var(--state-inactive-color); } .tile.off .ti::before { opacity: 0.15; }
+  .ti ha-icon { position: relative; }
+  .info { display: grid; min-width: 0; }
+  .info b { font-weight: 500; font-size: 14px; line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info small { font-size: 12px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .feature { height: 42px; border-radius: var(--ha-card-features-border-radius, 12px); background: color-mix(in srgb, var(--tile-color) 20%, transparent); overflow: hidden; }
+  .feature i { display: block; height: 100%; width: var(--v); background: var(--tile-color); }
+  .entities { padding: 4px 16px 8px; }
+  .entities h3 { margin: 12px 0 4px; font-size: 20px; font-weight: 400; }
+  .erow { display: flex; align-items: center; gap: 16px; min-height: 48px; }
+  .erow ha-icon { color: var(--state-icon-color); } .erow ha-icon.on { color: var(--c); }
+  .erow span { flex: 1; } .erow small { color: var(--secondary-text-color); font-size: 14px; }
+  .sw { width: 36px; height: 20px; border-radius: 10px; background: var(--ha-color-primary-40, var(--primary-color)); position: relative; flex: none; }
+  .sw::after { content: ""; position: absolute; top: 3px; right: 3px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+  .sw.off { background: color-mix(in srgb, var(--primary-text-color) 30%, transparent); } .sw.off::after { right: auto; left: 3px; }
+  .thermo { padding: 16px; display: grid; justify-items: center; gap: 4px; }
+  .thermo svg { width: 180px; height: 150px; }
+  .thermo .big { font-size: 44px; font-weight: 400; margin-top: -102px; }
+  .thermo small { color: var(--secondary-text-color); }
+  .thermo .modes { display: flex; gap: 8px; margin-top: 48px; }
+  .thermo .modes span { width: 44px; height: 44px; border-radius: var(--ha-card-features-border-radius, 12px); display: grid; place-items: center; background: color-mix(in srgb, var(--primary-text-color) 6%, transparent); }
+  .thermo .modes span.sel { background: color-mix(in srgb, var(--state-climate-heat-color) 20%, transparent); color: var(--state-climate-heat-color); }
+  .media { padding: 16px; display: grid; gap: 10px; }
+  .media .t { display: flex; gap: 12px; align-items: center; }
+  .media .art { width: 56px; height: 56px; border-radius: 12px; background: color-mix(in srgb, var(--state-media_player-active-color) 30%, transparent); display: grid; place-items: center; color: var(--state-media_player-active-color); }
+  .media .bar { height: 4px; border-radius: 2px; background: color-mix(in srgb, var(--primary-text-color) 12%, transparent); }
+  .media .bar i { display: block; height: 100%; width: 38%; border-radius: inherit; background: var(--primary-color); }
+  .media .ctl { display: flex; justify-content: center; gap: 20px; color: var(--primary-text-color); }
+  .button { padding: 18px 12px 14px; display: grid; justify-items: center; gap: 8px; }
+  .button ha-icon { --mdc-icon-size: 40px; color: var(--c); }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 16px; align-items: center; }
+  .btn { height: 36px; padding: 0 16px; border-radius: 18px; display: inline-flex; align-items: center; font-weight: 500; background: var(--ha-color-primary-40, var(--primary-color)); color: #fff; }
+  .btn.plain { background: color-mix(in srgb, var(--primary-text-color) 8%, transparent); color: var(--primary-text-color); }
+  .link { color: var(--primary-color); font-weight: 500; }
+
+  /* ---- a more-info dialog over a scrim */
+  .dialog-stage { position: relative; grid-column: 1 / -1; min-height: 330px; border-radius: 16px; overflow: hidden; }
+  .dialog-stage .under { position: absolute; inset: 0; padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; align-content: start; opacity: 0.9; }
+  .dialog-stage .scrim { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.32); backdrop-filter: var(--ha-dialog-scrim-backdrop-filter, none); }
+  .dialog { position: relative; margin: 28px auto; width: min(420px, calc(100% - 32px)); border-radius: var(--ha-dialog-border-radius, 28px); padding: 20px 24px;
+    background: var(--ha-dialog-surface-background, var(--mdc-theme-surface)); backdrop-filter: var(--ha-dialog-surface-backdrop-filter, none);
+    -webkit-backdrop-filter: var(--ha-dialog-surface-backdrop-filter, none); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); display: grid; gap: 14px; }
+  .dialog header { display: flex; align-items: center; gap: 12px; font-size: 20px; }
+  .dialog .slider { height: 140px; width: 96px; margin: 0 auto; border-radius: 24px; background: color-mix(in srgb, var(--state-light-active-color) 20%, transparent); overflow: hidden; display: flex; align-items: end; }
+  .dialog .slider i { display: block; width: 100%; height: 70%; background: var(--state-light-active-color); }
+  .dialog footer { display: flex; justify-content: flex-end; gap: 8px; }
+
+  .cap { font-size: 12px; color: var(--secondary-text-color); margin: 0 4px; }
+  @media (max-width: 870px) { .sidebar { display: none; } }
+</style>
+<script>
+  // ---- Stubs for HA's own elements (enough for our cards to render outside HA)
+  class HaIcon extends HTMLElement {
+    static get observedAttributes() { return ["icon"]; }
+    set icon(v) { this._icon = v; this.draw(); } get icon() { return this._icon; }
+    attributeChangedCallback() { this._icon = this.getAttribute("icon"); this.draw(); }
+    connectedCallback() { this.style.display = "inline-flex"; this.draw(); }
+    draw() {
+      if (!this.shadowRoot) this.attachShadow({ mode: "open" });
+      const alias = { "mdi:molecule-co2": "mdi:molecule-co-2" };
+      const p = window.MDI[alias[this._icon] || this._icon];
+      const s = "var(--mdc-icon-size, 24px)";
+      this.shadowRoot.innerHTML = p ? `<svg viewBox="0 0 24 24" style="width:${s};height:${s};fill:currentColor"><path d="${p}"/></svg>`
+        : `<span style="width:${s};height:${s};display:inline-block;border:1px dashed currentColor;border-radius:4px"></span>`;
+      if (!p && this._icon) console.warn("missing icon", this._icon);
+    }
+  }
+  customElements.define("ha-icon", HaIcon);
+  customElements.define("ha-state-icon", class extends HaIcon {
+    set stateObj(s) {
+      const d = s.entity_id.split(".")[0], dc = s.attributes.device_class, on = s.state === "on";
+      this.icon = s.attributes.icon || { window: on ? "mdi:window-open-variant" : "mdi:window-closed-variant", door: on ? "mdi:door-open" : "mdi:door-closed", moisture: "mdi:water-alert" }[dc]
+        || { light: on ? "mdi:lightbulb-on" : "mdi:lightbulb", switch: "mdi:power-socket-eu", media_player: "mdi:speaker", lock: "mdi:lock", fan: "mdi:fan", climate: "mdi:thermostat",
+             binary_sensor: ["motion", "occupancy", "presence"].includes(dc) ? "mdi:motion-sensor" : undefined }[d] || "mdi:gauge";
+    }
+  });
+  // Same CSS variables the real ha-card reads (src/components/ha-card.ts).
+  customElements.define("ha-card", class extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: "open" }).innerHTML = `<style>:host{display:block;position:relative;box-sizing:border-box;color:var(--primary-text-color);
+        background:var(--ha-card-background,var(--card-background-color,white));border-radius:var(--ha-card-border-radius,12px);
+        border:var(--ha-card-border-width,1px) solid var(--ha-card-border-color,var(--divider-color,#e0e0e0));box-shadow:var(--ha-card-box-shadow,none);
+        -webkit-backdrop-filter:var(--ha-card-backdrop-filter,none);backdrop-filter:var(--ha-card-backdrop-filter,none);transition:all .3s ease-out}</style><slot></slot>`;
+    }
+  });
+</script>
+</head>
+<body>
+<div class="app frame" id="frame">
+  <aside class="sidebar">
+    <div class="brand">Home Assistant</div>
+    <a class="sel" href="#"><ha-icon icon="mdi:view-dashboard-outline"></ha-icon>Home</a>
+    <a href="#"><ha-icon icon="mdi:lightning-bolt"></ha-icon>Energy</a>
+    <a href="#"><ha-icon icon="mdi:format-list-checks"></ha-icon>To-do lists</a>
+    <a href="#"><ha-icon icon="mdi:devices"></ha-icon>Settings</a>
+  </aside>
+  <main>
+    <div class="bg"></div>
+    <div class="toolbar"><span class="title">Home</span><span class="tabs"><span class="tab sel">Home</span><span class="tab">Rooms</span><span class="tab">Energy</span></span></div>
+    <div class="view dash" id="view">
+      <div class="section" id="col1">
+        <div class="heading"><b id="hello">Hello Alex</b></div>
+        <div class="badges left">
+          <span class="badge" style="--c:var(--state-person-home-color)"><ha-icon icon="mdi:account"></ha-icon>Alex <small>Home</small></span>
+          <span class="badge" style="--c:var(--state-person-home-color)"><ha-icon icon="mdi:account"></ha-icon>Sam <small>Home</small></span>
+          <span class="badge" style="--c:var(--state-icon-color)"><ha-icon icon="mdi:weather-night"></ha-icon>14 °C <small>Clear</small></span>
+        </div>
+        <ha-card class="tile" style="--tile-color:var(--state-alarm_control_panel-armed_home-color, var(--green-color))"><div class="top"><span class="ti"><ha-icon icon="mdi:shield-home"></ha-icon></span><span class="info"><b>House alarm</b><small>Armed home</small></span></div></ha-card>
+      </div>
+      <div class="section" id="col2"><div class="heading"><b>Rooms</b></div></div>
+      <div class="section" id="col3"><div class="heading"><b>Pantry</b></div></div>
+    </div>
+  </main>
+</div>
+<style>
+  .dash { grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); max-width: 1180px; margin: 0 auto; width: 100%; }
+  .heading { padding: 8px 4px 0; min-height: 36px; display: flex; align-items: end; }
+  .heading b { font-size: 16px; font-weight: 600; }
+  #col1 .heading b#hello { font-size: 24px; font-weight: 600; }
+  .badges.left { justify-content: flex-start; }
+</style>
+
+<script type="module">
+  const q = new URLSearchParams(location.search);
+  const dark = q.has("dark");
+  const which = (q.get("theme") || "pulse").toLowerCase();
+  document.documentElement.classList.toggle("dark", dark);
+  if (q.get("width")) { const f = document.getElementById("frame"); f.style.width = `${+q.get("width")}px`; }
+  const { applyPulseTheme, THEME_NAMES } = await import(q.get("from") || "./apply-theme.mjs");
+  if (which !== "none") await applyPulseTheme(which, dark);
+  document.title = `${THEME_NAMES[which] ?? "HA default"} · ${dark ? "dark" : "light"}${q.get("from") ? " · from " + q.get("from") : ""}`;
+
+  // ---- an invented home: three rooms
+  const now = Date.now(), ago = (m) => new Date(now - m * 60000).toISOString();
+  const states = {}, entities = {};
+  const add = (entity_id, state, attributes = {}, mins = 5, reg = {}) => {
+    states[entity_id] = { entity_id, state, attributes, last_changed: ago(mins), last_updated: ago(mins) };
+    entities[entity_id] = { entity_id, ...reg };
+  };
+  const L = { area_id: "living" }, B = { area_id: "bedroom" }, H = { area_id: "hall" };
+  add("binary_sensor.living_presence", "on", { friendly_name: "Living Room Presence", device_class: "occupancy" }, 120, L);
+  add("sensor.living_temperature", "22.8", { friendly_name: "Living Room Temperature", device_class: "temperature", unit_of_measurement: "°C" }, 5, L);
+  add("sensor.living_humidity", "48", { friendly_name: "Living Room Humidity", device_class: "humidity", unit_of_measurement: "%" }, 5, L);
+  add("light.living_ceiling", "on", { friendly_name: "Living Room Ceiling", color_temp_kelvin: 2700, brightness: 200, supported_color_modes: ["color_temp"] }, 40, L);
+  add("light.living_lamp", "on", { friendly_name: "Floor Lamp", brightness: 120, supported_color_modes: ["brightness"] }, 40, L);
+  add("light.living_strip", "off", { friendly_name: "LED Strip", supported_color_modes: ["rgb"] }, 300, L);
+  add("media_player.living_tv", "playing", { friendly_name: "Living Room TV", media_title: "Evening Light" }, 8, L);
+  add("climate.living_ac", "off", { friendly_name: "Living Room AC" }, 600, L);
+  add("cover.living_blinds", "closed", { friendly_name: "Living Room Blinds" }, 200, L);
+  add("vacuum.robot", "docked", { friendly_name: "Robot" }, 900, L);
+  add("binary_sensor.bedroom_presence", "off", { friendly_name: "Bedroom Presence", device_class: "occupancy" }, 90, B);
+  add("sensor.bedroom_temperature", "20.4", { friendly_name: "Bedroom Temperature", device_class: "temperature", unit_of_measurement: "°C" }, 5, B);
+  add("sensor.bedroom_humidity", "55", { friendly_name: "Bedroom Humidity", device_class: "humidity", unit_of_measurement: "%" }, 5, B);
+  add("light.bedroom_ceiling", "off", { friendly_name: "Bedroom Ceiling", supported_color_modes: ["brightness"] }, 300, B);
+  add("light.bedroom_bedside", "off", { friendly_name: "Bedside Lamp", supported_color_modes: ["color_temp"] }, 500, B);
+  add("binary_sensor.bedroom_window", "on", { friendly_name: "Bedroom Window", device_class: "window" }, 34, B);
+  add("fan.bedroom_fan", "off", { friendly_name: "Bedroom Fan" }, 800, B);
+  add("binary_sensor.hall_motion", "off", { friendly_name: "Hall Motion", device_class: "motion" }, 12, H);
+  add("sensor.hall_temperature", "21.1", { friendly_name: "Hall Temperature", device_class: "temperature", unit_of_measurement: "°C" }, 5, H);
+  add("light.hall_ceiling", "off", { friendly_name: "Hall Ceiling", supported_color_modes: ["brightness"] }, 60, H);
+  add("lock.front", "locked", { friendly_name: "Front Door Lock" }, 30, H);
+  add("binary_sensor.front_door", "off", { friendly_name: "Front Door", device_class: "door" }, 30, H);
+  add("person.alex", "home", { friendly_name: "Alex" });
+  add("person.sam", "home", { friendly_name: "Sam" });
+  add("sun.sun", "below_horizon", { friendly_name: "Sun" });
+  add("weather.home", "clear-night", { friendly_name: "Home", temperature: 14, temperature_unit: "°C" });
+  add("alarm_control_panel.house", "armed_home", { friendly_name: "House alarm", code_format: null, supported_features: 3 }, 95);
+
+  let n = 0;
+  const item = (name, extra) => ({ id: `i${++n}`, name, quantity: 1, unit: "pcs", category: "food", location: "pantry", expiry: null, min_quantity: null,
+    restock_quantity: null, auto_shop: true, notes: null, icon: null, created: "", updated: "", shopping: null, shopping_dismissed: false, ...extra });
+  const day = (d) => { const x = new Date(); x.setDate(x.getDate() + d); return x.toISOString().slice(0, 10); };
+  const items = [
+    item("Coffee beans", { quantity: 0, unit: "pack", min_quantity: 0, shopping: { uid: "u1", summary: "Coffee beans", amount: 1, auto: true } }),
+    item("Milk", { quantity: 1, unit: "bottle", category: "drinks", location: "fridge", min_quantity: 1, expiry: day(2) }),
+    item("Basmati rice", { quantity: 3, unit: "bag" }),
+    item("Olive oil", { quantity: 2, unit: "bottle" }),
+  ];
+  const snap = () => ({ entry_id: "e1", title: "Home", version: "0.1.0", items,
+    settings: { shopping_list: "todo.shopping_list", auto_add: true, auto_restock: true, expiring_days: 3 },
+    units: ["pcs", "pack", "bottle", "bag"], locations: ["pantry", "fridge"], categories: ["food", "drinks"] });
+  const en = { on: "On", off: "Off", playing: "Playing", home: "Home", locked: "Locked", armed_home: "Armed home", "clear-night": "Clear", open: "Open", closed: "Closed", docked: "Docked" };
+  const hass = {
+    states, entities, devices: {},
+    areas: { living: { area_id: "living", name: "Living Room", icon: "mdi:sofa" }, bedroom: { area_id: "bedroom", name: "Bedroom", icon: "mdi:bed" }, hall: { area_id: "hall", name: "Hall", icon: "mdi:door-closed" } },
+    user: { name: "Alex" }, language: "en", locale: { language: "en", time_format: "24" }, themes: { darkMode: dark },
+    callService: async () => {}, formatEntityState: (s) => s.attributes.unit_of_measurement ? `${s.state} ${s.attributes.unit_of_measurement}` : en[s.state] ?? s.state,
+    connection: { subscribeMessage: async (cb) => { setTimeout(() => cb(snap()), 30); return () => {}; } },
+    callWS: async (msg) => msg.type === "config/label_registry/list" ? [] : msg.type === "stock_pulse/inventories" ? [{ entry_id: "e1", title: "Home" }] : null,
+  };
+
+  const card = async (path, tag, config, col) => {
+    try { await import(path); } catch { col.insertAdjacentHTML("beforeend", `<div class="cap">bundle not found (${path})</div>`); return; }
+    await customElements.whenDefined(tag);
+    const el = document.createElement(tag);
+    el.setConfig(config); el.hass = hass; col.appendChild(el); return el;
+  };
+  const HP = "../../home-pulse-card/dist/home-pulse-card.js", AP = "../../area-pulse-card/dist/area-pulse-card.js";
+  const col1 = document.getElementById("col1"), col2 = document.getElementById("col2"), col3 = document.getElementById("col3");
+  // Icon-only shortcuts floating on the view, then the status card.
+  await card(HP, "home-pulse-card", { type: "custom:home-pulse-card", appearance: "flat", sections: ["shortcuts"], show_names: false, columns: 5, shortcuts: [
+    { name: "Lights", icon: "mdi:lightbulb-group", navigation_path: "lights", badge: "lights" },
+    { name: "Climate", icon: "mdi:thermostat", navigation_path: "climate" },
+    { name: "Security", icon: "mdi:shield-half-full", navigation_path: "security" },
+    { name: "Energy", icon: "mdi:lightning-bolt", navigation_path: "energy" },
+    { name: "Shopping", icon: "mdi:cart-outline", navigation_path: "shopping" }] }, col1);
+  await card(HP, "home-pulse-card", { type: "custom:home-pulse-card", sections: ["status", "alerts", "nudges"], show_inactive: true }, col1);
+  const actions = [{ preset: "lights_on" }, { preset: "lights_off" }, { preset: "vacuum_area" }];
+  const rooms = {};
+  for (const area of ["living", "bedroom", "hall"]) rooms[area] = await card(AP, "area-pulse-card", { type: "custom:area-pulse-card", area, show_inactive: true, actions }, col2);
+  await card("../../stock-pulse/custom_components/stock_pulse/frontend/stock-pulse-card.js", "stock-pulse-card", { type: "custom:stock-pulse-card", group_by: "none" }, col3);
+  window.rooms = rooms;
+  if (rooms[q.get("popup")]) { await new Promise((r) => setTimeout(r, 300)); await rooms[q.get("popup")]._openRoom(); }
+  window.previewReady = true;
+</script>
+</body>
+</html>
