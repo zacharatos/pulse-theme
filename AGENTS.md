@@ -35,6 +35,7 @@ End with a short hand-off instead of a commit:
 2. What you ran to check it (`npm run check`, the preview harness, a throwaway HA) and the result, including the contrast summary.
 3. Anything he should try in a real Home Assistant by hand (see "Things only a real Home Assistant can prove" below).
 4. Which components the change touches: a token change reaches every Pulse card.
+5. The tag to push and why that part was bumped (see **Versions** under Conventions).
 
 Don't write a commit message unless he asks for one. If he does, offer it as a suggestion in your reply; never use it yourself.
 
@@ -154,7 +155,8 @@ The harness applies the theme exactly like HA, but its native cards are look-ali
 
 ## Conventions
 
-- **Releases:** the maintainer bumps `version` in `package.json`, commits, and pushes a `vX.Y.Z` tag; the release workflow checks and publishes. You never tag or push. Only touch the version when asked.
+- **Releases:** you prepare the next version with every change (below); the maintainer commits and pushes the `vX.Y.Z` tag you named; the release workflow checks and publishes. You never tag or push.
+- **Versions: every change carries its next version.** Read the latest tag on the remote (`git ls-remote --tags --refs origin | sed 's#.*refs/tags/##' | sort -V | tail -1`; if it can't be reached, the newest local tag, and say so). Bump **major** when something that worked stops working or the user has to act (a theme name or a `--pulse-*` token removed or renamed, a token changing meaning, a higher minimum Home Assistant), **minor** for something new or a deliberate change of the default look or behaviour, **patch** for fixes, polish, translations, refactors, docs, tests and CI. The biggest change decides; when torn, take the bigger. Write it to `version` in `package.json`, all equal, then rebuild. If the working tree already holds an unreleased bump, keep it unless today's change needs a bigger part (then derive again from the remote tag). End the hand-off with the tag and why: **Tag:** `vX.Y.Z` (latest on the remote: `vA.B.C`). **Minor**, because … The full rule is Rule 2 in the home base `AGENTS.md`.
 - **CI** (`validate.yml`): HACS validation, generated file is up to date, contrast, YAML validity. Run `npm run check` before handing off.
 - **No private data:** the harness and screenshots use invented names. Never put real entity IDs, addresses or photos in the repo.
 - **Screenshots** in `docs/` come from the preview harness at 1280×820. Refresh them when the look changes and the maintainer wants it.
