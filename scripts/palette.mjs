@@ -26,7 +26,8 @@ export const SYSTEM_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "S
 /** The three variations. `name` is what HA shows in the theme picker.
  *  shape: corner radii and tile-icon shape; font: the font stack.
  *  Per mode: neutral [hue, chroma] and lightness of page / card / section, accent [hue, chroma],
- *  border width, card shadow, and chip fill ({ on: "text" | "accent" | "white", alpha }).
+ *  border width, card shadow, and chip fill ({ on: "text" | "accent" | "white", alpha }, optionally with its
+ *  own `hover` and `strong` steps as { on, alpha }; by default they are the same base at +0.04 / +0.08).
  */
 /**
  * Pulse Glass's grain: a tiny inline SVG noise tile (no download), tinted `rgb` 0–1 and as strong as `alpha`.
@@ -68,7 +69,8 @@ export const VARIATIONS = [
     },
     light: {
       neutral: [60, 0.012], L: { bg: 0.94, card: 0.98, section: 0.95 }, accent: [272, 0.1], divider: "rgba(60, 40, 60, 0.08)", statePrefer: 0.64,
-      border: 0, chip: { on: "white", alpha: 0.55 },
+      // More white is the only "stronger" that reads on frosted white: hover and active step up clearly.
+      border: 0, chip: { on: "white", alpha: 0.55, hover: { on: "white", alpha: 0.7 }, strong: { on: "white", alpha: 0.88 } },
       shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 12px 32px -14px rgba(70, 50, 100, 0.3)",
       glass: {
         alpha: 0.5, blur: "blur(26px) saturate(180%)",
@@ -85,7 +87,8 @@ export const VARIATIONS = [
     dark: { neutral: [345, 0.022], L: { bg: 0.135, card: 0.235, section: 0.17 }, cardChroma: 1.9, accent: [345, 0.085], divider: "rgba(255, 230, 240, 0.06)",
       border: 0, shadow: "none", chip: { on: "accent", alpha: 0.16 } },
     light: { neutral: [345, 0.022], L: { bg: 0.985, card: 0.938, section: 0.96 }, cardChroma: 1.5, accent: [345, 0.1], divider: "rgba(60, 30, 45, 0.07)", statePrefer: 0.6,
-      border: 0, shadow: "none", chip: { on: "white", alpha: 0.62 } },
+      // White pills on a tonal card; active is an accent tint (Material You's "selected"), since more white barely shows.
+      border: 0, shadow: "none", chip: { on: "white", alpha: 0.62, hover: { on: "white", alpha: 0.8 }, strong: { on: "accent", alpha: 0.16 } } },
   },
 ];
 
@@ -123,6 +126,10 @@ export function derive(v, mode) {
     // Re-check secondary text on the accent-tinted chips (darker/lighter if needed).
     m.text2 = solve(nC * 0.8, nH, [onAll(4.6), onChips(4.6), [(h) => ratio(h, m.bg), 4.6]], dark, dark ? 0.72 : 0.5);
   }
+  // Hover and active (strong) steps: the same base a little stronger, unless the mode names its own.
+  const step = (spec, add) => spec ? [spec.on === "white" ? "#ffffff" : spec.on === "accent" ? m.accent : m.text, spec.alpha] : [m.chipBase, +(m.chipFill + add).toFixed(3)];
+  m.chipHover = step(s.chip.hover, 0.04);
+  m.chipStrong = step(s.chip.strong, 0.08);
   // Accent scale for HA's newer components (buttons, switches, checkboxes).
   m.primary = Object.fromEntries(Object.entries(PRIMARY_L).map(([k, L]) => [k, hex(L, aC * Math.min(1, (1 - L) / 0.25, L / 0.35), aH)]));
   m.primary[40] = solve(aC, aH, [[(h) => ratio("#ffffff", h), 4.6]], false, 0.52);

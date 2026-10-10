@@ -35,6 +35,8 @@ function check(name, mode, v) {
   const cardFill = parseColour(v["ha-card-background"] ?? v["card-background-color"]);
   const cards = stops.map((s) => over(cardFill, s));
   const chips = cards.map((c) => over(C("pulse-surface-neutral"), c));
+  // The active fill (an "on" action, the current mode, a shortcut whose entity is on).
+  const strong = cards.map((c) => over(C("pulse-surface-neutral-strong"), c));
   const tint = (fg) => cards.map((c) => over({ rgb: fg.rgb, a: 0.2 }, c)); // a native tile's icon background
   const header = stops.map((s) => over(C("app-header-background-color"), s));
   const dialog = stops.map((s) => over(C("ha-dialog-surface-background"), s));
@@ -47,6 +49,10 @@ function check(name, mode, v) {
   pair("Text on section background", "primary-text-color", [C("secondary-background-color").rgb], 4.5);
   pair("Secondary text on cards", "secondary-text-color", cards, 4.5);
   pair("Secondary text on chips", "secondary-text-color", chips, 4.5);
+  pair("Text on active fills", "primary-text-color", strong, 4.5);
+  pair("Accent icon on active fills", "pulse-accent", strong, 3);
+  // Not checked yet: gold on an active fill in Pulse light measures ~1.95, under the gold exception's 2.1
+  // (an "on" Lights action in Area Pulse). Open question for Timos, see decision 0001, Phase 5.
   pair("Secondary text on page", "secondary-text-color", [page], 4.5);
   pair("Text on header", "app-header-text-color", header, 4.5);
   pair("Text on sidebar", "sidebar-text-color", sidebar, 4.5);

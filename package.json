@@ -1,6 +1,6 @@
 {
   "name": "pulse-theme",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "private": true,
   "description": "Pulse: a calm theme family for Home Assistant (Pulse, Pulse Glass, Pulse Tonal) and the shared design tokens of the Pulse cards.",
   "type": "module",

@@ -47,7 +47,7 @@ You can also give a single dashboard view its own theme: edit the view and pick 
 | Accent | Dusk blue | Dusk blue | Warm mauve |
 | Shape | 16px cards, 12px controls | 20px cards, 14px controls | 24px cards, 16px controls |
 | Card edges | 1px hairline; soft shadow in light mode | No border: a lit top edge, a faint inner outline and a drop shadow | No border, no shadow: the fill carries the shape |
-| Chips and buttons | A share of the text colour | Frosted white | Light pills in light mode, accent-tinted in dark |
+| Chips and buttons | A share of the text colour | Frosted white; active ones a brighter white | Light pills in light mode (active: accent-tinted), accent-tinted in dark |
 | Tile icons | Circles | Circles | Rounded squares (HA 2026+) |
 | Font | Your device's | Your device's | Your device's rounded variant where there is one (Apple) |
 | Cost | None | Blur (see below) | None |
@@ -56,7 +56,7 @@ You can also give a single dashboard view its own theme: edit the view and pick 
 
 ## Accessibility
 
-Contrast is measured, not eyeballed: 80–81 pairs per variation and mode, covering text on cards, page, chips, dialogs, header and sidebar; text on buttons; and every state colour as an icon on its tile tint and on a chip, plus as text where it's used as text. For Pulse Glass, every pair is measured against the worst case: the frosted card over each colour stop of the background.
+Contrast is measured, not eyeballed: 82–83 pairs per variation and mode, covering text on cards, page, chips, active fills, dialogs, header and sidebar; text on buttons; and every state colour as an icon on its tile tint and on a chip, plus as text where it's used as text. For Pulse Glass, every pair is measured against the worst case: the frosted card over each colour stop of the background.
 
 **One deliberate exception.** In light mode, lights use a bright gold that reaches about 2.6:1 on a card and 2.2:1 on its own tile tint, below the 3:1 minimum for icons. Every yellow that reaches 3:1 on a light background looks mustard or brown. A light's state is always also written as text ("On · 70%"), so colour is never the only signal. In dark mode, lights pass normally.
 

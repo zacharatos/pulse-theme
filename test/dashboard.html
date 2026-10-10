@@ -294,8 +294,8 @@
   };
   const HP = "../../home-pulse-card/dist/home-pulse-card.js", AP = "../../area-pulse-card/dist/area-pulse-card.js";
   const col1 = document.getElementById("col1"), col2 = document.getElementById("col2"), col3 = document.getElementById("col3");
-  // Icon-only shortcuts floating on the view, then the status card.
-  await card(HP, "home-pulse-card", { type: "custom:home-pulse-card", appearance: "flat", sections: ["shortcuts"], show_names: false, columns: 5, shortcuts: [
+  // Icon-only shortcuts (Home Pulse Shortcuts: tiles like native tile cards), then the status card.
+  await card(HP, "home-pulse-shortcuts-card", { type: "custom:home-pulse-shortcuts-card", show_names: false, columns: 5, shortcuts: [
     { name: "Lights", icon: "mdi:lightbulb-group", navigation_path: "lights", badge: "lights" },
     { name: "Climate", icon: "mdi:thermostat", navigation_path: "climate" },
     { name: "Security", icon: "mdi:shield-half-full", navigation_path: "security" },
