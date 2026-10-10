@@ -13,10 +13,11 @@ A calm theme family for Home Assistant. Neutral surfaces, one accent, and colour
 ## Features
 
 - **Built-in cards look calm too.** Pulse sets Home Assistant's own variables, so tile, area, entities, thermostat, media cards, dialogs, the sidebar and settings all change. You don't need any custom cards.
-- **Colour that means something.** Muted green for "all good" (locked, home, armed), orange for "needs a look" (a door or window open, something running low), warm red for problems (leak, unlocked, alarm), gold for lights. Open doors and windows no longer share the "light on" colour.
+- **Colour that means something.** Muted green for "all good" (locked, home, armed), orange for "needs a look" (a door or window open, something running low), warm red for problems (leak, unlocked, alarm), gold for lights. Open doors and windows no longer share the "light on" colour, and neither do automations that are on or scripts that are running: they take the accent.
 - **Readable in both modes.** Every text, icon and state colour is checked against WCAG 2.1 AA in light and dark (`npm run contrast`). One deliberate exception is listed below.
 - **Your device's own font.** SF on Apple devices, Segoe UI on Windows, Roboto on Android. Nothing to download, and it works offline.
 - **The newer HA design tokens too.** Buttons, switches and checkboxes in recent frontends follow the accent instead of staying HA blue.
+- **Switches that read when off.** On is the accent; off is a grey thumb on a faint track, clear on every surface including Pulse Glass's frosted white.
 - **Design tokens for card authors.** Every colour, radius and rhythm is also exposed as a `--pulse-*` variable (see [For card authors](#for-card-authors)).
 
 ## Installation
@@ -56,7 +57,7 @@ You can also give a single dashboard view its own theme: edit the view and pick 
 
 ## Accessibility
 
-Contrast is measured, not eyeballed: 82–83 pairs per variation and mode, covering text on cards, page, chips, active fills, dialogs, header and sidebar; text on buttons; and every state colour as an icon on its tile tint and on a chip, plus as text where it's used as text. For Pulse Glass, every pair is measured against the worst case: the frosted card over each colour stop of the background.
+Contrast is measured, not eyeballed: 86–87 pairs per variation and mode, covering text on cards, page, chips, active fills, dialogs, header and sidebar; text on buttons; every state colour as an icon on its tile tint and on a chip, plus as text where it's used as text; and both switch thumbs (on and off) on cards. For Pulse Glass, every pair is measured against the worst case: the frosted card over each colour stop of the background.
 
 **One deliberate exception.** In light mode, lights use a bright gold that reaches about 2.6:1 on a card and 2.2:1 on its own tile tint, below the 3:1 minimum for icons. Every yellow that reaches 3:1 on a light background looks mustard or brown. A light's state is always also written as text ("On · 70%"), so colour is never the only signal. In dark mode, lights pass normally.
 
@@ -98,6 +99,8 @@ Pulse exposes its decisions as `--pulse-*` CSS variables. Read them first, then 
 | `--pulse-radius`, `--pulse-control-radius`, `--pulse-chip-height` | Cards and controls: 16/12px in Pulse, 20/14px in Glass, 24/16px in Tonal; 30px pill chips |
 | `--pulse-gap`, `--pulse-pad`, `--pulse-row-height` | 12px, 12px, 56px |
 | `--pulse-motion-fast`, `-normal`, `-slow`, `--pulse-ease` | 150 / 250 / 350 ms and a calm easing curve |
+
+For a switch of your own, read Home Assistant's switch variables, which Pulse sets: `--switch-checked-color` (on), `--switch-unchecked-button-color` (the off thumb) and `--switch-unchecked-track-color` (the off track; HA draws it at 38%).
 
 Home Assistant also creates `--rgb-pulse-<name>` (as `r, g, b`) for every colour token, for use in `rgba()`.
 

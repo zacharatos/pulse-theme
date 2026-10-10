@@ -89,6 +89,12 @@ Pulse:
       ha-dialog-surface-background: "#fefefe"
       mdc-theme-surface: "#fefefe"
 
+      # Switches (HA's ha-switch, and the Pulse cards that draw their own): on in the accent; off a grey thumb on
+      # a faint track (HA draws the track at 38%), so the off state reads on every surface, frosted white included
+      switch-checked-color: "#526094"
+      switch-unchecked-button-color: "#66635f"
+      switch-unchecked-track-color: "#66635f"
+
       # Status colours HA uses for messages and alerts
       success-color: "#3d8152"
       info-color: "#4877a6"
@@ -116,7 +122,10 @@ Pulse:
       brown-color: "#a07a61"
 
       # State colours where HA's default mapping isn't what Pulse means (open doors and windows are
-      # "needs a look", not amber like a light that is on)
+      # "needs a look", not amber like a light that is on; an automation that is on, or a script that is
+      # running, is the house's own logic at work: the accent, not a light's gold)
+      state-automation-on-color: "#526094"
+      state-script-on-color: "#526094"
       state-binary_sensor-door-on-color: "#ba5702"
       state-binary_sensor-garage_door-on-color: "#ba5702"
       state-binary_sensor-opening-on-color: "#ba5702"
@@ -213,6 +222,12 @@ Pulse:
       ha-dialog-surface-background: "#1b1916"
       mdc-theme-surface: "#1b1916"
 
+      # Switches (HA's ha-switch, and the Pulse cards that draw their own): on in the accent; off a grey thumb on
+      # a faint track (HA draws the track at 38%), so the off state reads on every surface, frosted white included
+      switch-checked-color: "#a6b5e8"
+      switch-unchecked-button-color: "#a6a4a1"
+      switch-unchecked-track-color: "#a6a4a1"
+
       # Status colours HA uses for messages and alerts
       success-color: "#8cd19e"
       info-color: "#8bbcef"
@@ -240,7 +255,10 @@ Pulse:
       brown-color: "#d6ae93"
 
       # State colours where HA's default mapping isn't what Pulse means (open doors and windows are
-      # "needs a look", not amber like a light that is on)
+      # "needs a look", not amber like a light that is on; an automation that is on, or a script that is
+      # running, is the house's own logic at work: the accent, not a light's gold)
+      state-automation-on-color: "#a6b5e8"
+      state-script-on-color: "#a6b5e8"
       state-binary_sensor-door-on-color: "#ffa068"
       state-binary_sensor-garage_door-on-color: "#ffa068"
       state-binary_sensor-opening-on-color: "#ffa068"
@@ -362,6 +380,12 @@ Pulse Glass:
       ha-dialog-surface-backdrop-filter: "blur(26px) saturate(180%)"
       mdc-theme-surface: "#fdfdfc"
 
+      # Switches (HA's ha-switch, and the Pulse cards that draw their own): on in the accent; off a grey thumb on
+      # a faint track (HA draws the track at 38%), so the off state reads on every surface, frosted white included
+      switch-checked-color: "#4f5e9c"
+      switch-unchecked-button-color: "#68625e"
+      switch-unchecked-track-color: "#68625e"
+
       # Status colours HA uses for messages and alerts
       success-color: "#35794b"
       info-color: "#416f9e"
@@ -389,7 +413,10 @@ Pulse Glass:
       brown-color: "#987359"
 
       # State colours where HA's default mapping isn't what Pulse means (open doors and windows are
-      # "needs a look", not amber like a light that is on)
+      # "needs a look", not amber like a light that is on; an automation that is on, or a script that is
+      # running, is the house's own logic at work: the accent, not a light's gold)
+      state-automation-on-color: "#4f5e9c"
+      state-script-on-color: "#4f5e9c"
       state-binary_sensor-door-on-color: "#b05100"
       state-binary_sensor-garage_door-on-color: "#b05100"
       state-binary_sensor-opening-on-color: "#b05100"
@@ -490,6 +517,12 @@ Pulse Glass:
       ha-dialog-surface-backdrop-filter: "blur(26px) saturate(180%)"
       mdc-theme-surface: "#3b3c4b"
 
+      # Switches (HA's ha-switch, and the Pulse cards that draw their own): on in the accent; off a grey thumb on
+      # a faint track (HA draws the track at 38%), so the off state reads on every surface, frosted white included
+      switch-checked-color: "#a3b4f2"
+      switch-unchecked-button-color: "#c1c1cd"
+      switch-unchecked-track-color: "#c1c1cd"
+
       # Status colours HA uses for messages and alerts
       success-color: "#8cd19e"
       info-color: "#8bbcef"
@@ -517,7 +550,10 @@ Pulse Glass:
       brown-color: "#d6ae93"
 
       # State colours where HA's default mapping isn't what Pulse means (open doors and windows are
-      # "needs a look", not amber like a light that is on)
+      # "needs a look", not amber like a light that is on; an automation that is on, or a script that is
+      # running, is the house's own logic at work: the accent, not a light's gold)
+      state-automation-on-color: "#a3b4f2"
+      state-script-on-color: "#a3b4f2"
       state-binary_sensor-door-on-color: "#ffa068"
       state-binary_sensor-garage_door-on-color: "#ffa068"
       state-binary_sensor-opening-on-color: "#ffa068"
@@ -636,6 +672,12 @@ Pulse Tonal:
       ha-dialog-surface-background: "#fce2f0"
       mdc-theme-surface: "#fce2f0"
 
+      # Switches (HA's ha-switch, and the Pulse cards that draw their own): on in the accent; off a grey thumb on
+      # a faint track (HA draws the track at 38%), so the off state reads on every surface, frosted white included
+      switch-checked-color: "#8b4a70"
+      switch-unchecked-button-color: "#6b5f65"
+      switch-unchecked-track-color: "#6b5f65"
+
       # Status colours HA uses for messages and alerts
       success-color: "#2f7346"
       info-color: "#3c6b99"
@@ -663,7 +705,10 @@ Pulse Tonal:
       brown-color: "#926d54"
 
       # State colours where HA's default mapping isn't what Pulse means (open doors and windows are
-      # "needs a look", not amber like a light that is on)
+      # "needs a look", not amber like a light that is on; an automation that is on, or a script that is
+      # running, is the house's own logic at work: the accent, not a light's gold)
+      state-automation-on-color: "#8b4a70"
+      state-script-on-color: "#8b4a70"
       state-binary_sensor-door-on-color: "#a74d02"
       state-binary_sensor-garage_door-on-color: "#a74d02"
       state-binary_sensor-opening-on-color: "#a74d02"
@@ -760,6 +805,12 @@ Pulse Tonal:
       ha-dialog-surface-background: "#2c1623"
       mdc-theme-surface: "#2c1623"
 
+      # Switches (HA's ha-switch, and the Pulse cards that draw their own): on in the accent; off a grey thumb on
+      # a faint track (HA draws the track at 38%), so the off state reads on every surface, frosted white included
+      switch-checked-color: "#dfa2c4"
+      switch-unchecked-button-color: "#ada0a7"
+      switch-unchecked-track-color: "#ada0a7"
+
       # Status colours HA uses for messages and alerts
       success-color: "#8cd19e"
       info-color: "#8bbcef"
@@ -787,7 +838,10 @@ Pulse Tonal:
       brown-color: "#d6ae93"
 
       # State colours where HA's default mapping isn't what Pulse means (open doors and windows are
-      # "needs a look", not amber like a light that is on)
+      # "needs a look", not amber like a light that is on; an automation that is on, or a script that is
+      # running, is the house's own logic at work: the accent, not a light's gold)
+      state-automation-on-color: "#dfa2c4"
+      state-script-on-color: "#dfa2c4"
       state-binary_sensor-door-on-color: "#ffa068"
       state-binary_sensor-garage_door-on-color: "#ffa068"
       state-binary_sensor-opening-on-color: "#ffa068"

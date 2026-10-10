@@ -79,12 +79,19 @@ function mode(v, m) {
     ...(glass ? { "ha-dialog-surface-backdrop-filter": glass.blur } : {}),
     "mdc-theme-surface": glass ? solidCard : m.card,
   }]);
+  g.push(["Switches (HA's ha-switch, and the Pulse cards that draw their own): on in the accent; off a grey thumb on\n# a faint track (HA draws the track at 38%), so the off state reads on every surface, frosted white included", {
+    "switch-checked-color": m.accent,
+    "switch-unchecked-button-color": m.text2,
+    "switch-unchecked-track-color": m.text2,
+  }]);
   g.push(["Status colours HA uses for messages and alerts", {
     "success-color": m.ok, "info-color": m.info, "warning-color": m.warn, "error-color": m.bad,
   }]);
   g.push(["HA palette, muted. HA's state colours (state-light-active-color, …) derive from these,\n# so native tiles and our cards calm down together. amber = lights.",
     Object.fromEntries(Object.entries(m.palette).map(([k, c]) => [`${k}-color`, c]))]);
-  g.push(["State colours where HA's default mapping isn't what Pulse means (open doors and windows are\n# \"needs a look\", not amber like a light that is on)", {
+  g.push(["State colours where HA's default mapping isn't what Pulse means (open doors and windows are\n# \"needs a look\", not amber like a light that is on; an automation that is on, or a script that is\n# running, is the house's own logic at work: the accent, not a light's gold)", {
+    "state-automation-on-color": m.accent,
+    "state-script-on-color": m.accent,
     "state-binary_sensor-door-on-color": m.warn,
     "state-binary_sensor-garage_door-on-color": m.warn,
     "state-binary_sensor-opening-on-color": m.warn,

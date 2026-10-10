@@ -70,6 +70,12 @@ function check(name, mode, v) {
     pair(`${k} icon on chips`, k, chips, 3);
     pair(`${k} icon on its tile tint`, k, tint(C(k)), 3);
   }
+  // Automations that are on and running scripts take the accent as their state colour (native tiles).
+  pair("Accent as a state colour, icon on its tile tint", "state-automation-on-color", tint(C("state-automation-on-color")), 3);
+  pair("Accent as a state colour, icon on chips", "state-automation-on-color", chips, 3);
+  // Switches: the thumb is what shows on or off (the track is drawn at 38%), so it must read on the card.
+  pair("Switch thumb on cards (on)", "switch-checked-color", cards, 3);
+  pair("Switch thumb on cards (off)", "switch-unchecked-button-color", cards, 3);
   pair("pulse-active icon on cards", "pulse-active", cards, 3);
   pair("pulse-active icon on chips", "pulse-active", chips, 3);
   pair("pulse-active icon on its tile tint", "pulse-active", tint(C("pulse-active")), 3);
