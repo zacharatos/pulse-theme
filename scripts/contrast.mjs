@@ -30,7 +30,7 @@ const EXCEPTIONS = [
 function check(name, mode, v) {
   const C = (k) => { if (v[k] === undefined) throw new Error(`${name}/${mode}: missing ${k}`); return parseColour(v[k]); };
   const page = C("primary-background-color").rgb;
-  // What cards actually sit on: the page colour, or every colour stop of a gradient background.
+  // What cards and page text actually sit on: the page colour, or every colour stop of a gradient background.
   const stops = (v["lovelace-background"].match(/#[0-9a-f]{6}/gi) ?? [v["primary-background-color"]]).map((h) => parseColour(h).rgb);
   const cardFill = parseColour(v["ha-card-background"] ?? v["card-background-color"]);
   const cards = stops.map((s) => over(cardFill, s));
@@ -45,7 +45,7 @@ function check(name, mode, v) {
   const pair = (label, fgKey, bgs, min, fg = C(fgKey).rgb) => rows.push({ label, fgKey, r: Math.min(...bgs.map((b) => ratio(fg, b))), min });
 
   pair("Text on cards", "primary-text-color", cards, 4.5);
-  pair("Text on page", "primary-text-color", [page], 4.5);
+  pair("Text on page", "primary-text-color", [page, ...stops], 4.5);
   pair("Text on section background", "primary-text-color", [C("secondary-background-color").rgb], 4.5);
   pair("Secondary text on cards", "secondary-text-color", cards, 4.5);
   pair("Secondary text on chips", "secondary-text-color", chips, 4.5);
@@ -53,7 +53,7 @@ function check(name, mode, v) {
   pair("Accent icon on active fills", "pulse-accent", strong, 3);
   // Not checked yet: gold on an active fill in Pulse light measures ~1.95, under the gold exception's 2.1
   // (an "on" Lights action in Area Pulse). Open question for Timos, see decision 0001, Phase 5.
-  pair("Secondary text on page", "secondary-text-color", [page], 4.5);
+  pair("Secondary text on page", "secondary-text-color", [page, ...stops], 4.5);
   pair("Text on header", "app-header-text-color", header, 4.5);
   pair("Text on sidebar", "sidebar-text-color", sidebar, 4.5);
   pair("Selected item in sidebar", "sidebar-selected-text-color", sidebar, 4.5);

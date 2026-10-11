@@ -1,0 +1,21 @@
+name: An idea
+description: Something the theme could do better, or a part of Home Assistant it should calm down.
+labels: [idea]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you want to see, and why?
+      description: A screenshot of the part you mean helps. The need matters more than the exact solution.
+    validations:
+      required: true
+  - type: dropdown
+    id: variation
+    attributes:
+      label: Which theme?
+      options:
+        - Pulse
+        - Pulse Glass
+        - Pulse Tonal
+        - All of them
+        - A new variation

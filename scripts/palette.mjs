@@ -26,67 +26,64 @@ export const SYSTEM_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "S
 /** The three variations. `name` is what HA shows in the theme picker.
  *  shape: corner radii and tile-icon shape; font: the font stack.
  *  Per mode: neutral [hue, chroma] and lightness of page / card / section, accent [hue, chroma],
- *  border width, card shadow, and chip fill ({ on: "text" | "accent" | "white", alpha }, optionally with its
+ *  border width, card shadow, an optional view background with a glow ({ hue, base: [L, C], top: [L, C] }: the view's
+ *  colour, and a soft pool of light at its top; header and sidebar keep the page colour), and chip fill ({ on: "text" | "accent" | "white", alpha }, optionally with its
  *  own `hover` and `strong` steps as { on, alpha }; by default they are the same base at +0.04 / +0.08).
  */
-/**
- * Pulse Glass's grain: a tiny inline SVG noise tile (no download), tinted `rgb` 0–1 and as strong as `alpha`.
- * Percent-encoded so it sits unquoted in url() and in the YAML string.
- */
-function grain(rgb, alpha) {
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 ${rgb} 0 0 0 0 ${rgb} 0 0 0 0 ${rgb} ${alpha} 0 0 0 0'/></filter><rect width='160' height='160' filter='url(%23g)'/></svg>`;
-  const data = encodeURIComponent(svg).replace(/'/g, "%27").replace(/\(/g, "%28").replace(/\)/g, "%29").replace(/%2523/g, "%23");
-  return `url(data:image/svg+xml,${data}) repeat`;
-}
-
 const STONE_LIGHT_SHADOW = "0 1px 2px rgba(40, 30, 20, 0.05), 0 4px 16px -4px rgba(40, 30, 20, 0.07)";
 export const VARIATIONS = [
   {
-    // Pulse: matte and precise. Warm stone neutrals, hairline edges; in light mode a soft shadow for depth.
+    // Pulse: matte and precise. Warm stone and linen neutrals, hairline edges. Light: white cards on stone with a
+    // soft shadow. Dark ("lamplight"): warm charcoal, a faint warm glow at the top of the page, and cards lifted
+    // by a lit top edge and a drop shadow, so the dark mode has the same warmth and depth as the light one.
     key: "stone", name: "Pulse",
     shape: { radius: 16, control: 12, tileIcon: null },
     font: SYSTEM_FONT,
-    dark: { neutral: [70, 0.006], L: { bg: 0.165, card: 0.215, section: 0.245 }, accent: [272, 0.075], divider: "rgba(240, 236, 228, 0.09)",
-      border: 1, shadow: "none", chip: { on: "text", alpha: 0.07 } },
+    dark: { neutral: [62, 0.012], L: { bg: 0.175, card: 0.235, section: 0.205 }, accent: [262, 0.085], divider: "rgba(255, 240, 220, 0.07)",
+      glow: { hue: 67, base: [0.211, 0.0075], top: [0.27, 0.016] },
+      border: 1, shadow: "inset 0 1px 0 rgba(255, 244, 228, 0.06), 0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 28px -12px rgba(0, 0, 0, 0.6)",
+      chip: { on: "text", alpha: 0.07 } },
     light: { neutral: [75, 0.009], L: { bg: 0.948, card: 0.998, section: 0.92 }, cardChroma: 0.25, accent: [272, 0.085], divider: "rgba(40, 36, 30, 0.07)", statePrefer: 0.68,
       border: 1, shadow: STONE_LIGHT_SHADOW, chip: { on: "text", alpha: 0.065 } },
   },
   {
-    // Pulse Glass: visionOS-like. Frosted panels with a light rim and a soft drop shadow, over a quiet textured
-    // background: a fine grain on a neutral base with one soft pool of light at the top. No colour fields, so a
-    // card's tint never reads as a state.
+    // Pulse Glass: visionOS-like. Frosted panels with a light rim and a soft drop shadow over a graphite background:
+    // a neutral base with one soft pool of light at the top. No colour fields (a card's tint would read as a state),
+    // no grain (blurred grain turns into blotches behind the cards), and a gentle saturate, which otherwise
+    // amplifies every unevenness behind the glass.
     key: "glass", name: "Pulse Glass",
     shape: { radius: 20, control: 14, tileIcon: null },
     font: SYSTEM_FONT,
     dark: {
-      neutral: [285, 0.02], L: { bg: 0.16, card: 0.24, section: 0.22 }, accent: [272, 0.09], divider: "rgba(255, 255, 255, 0.08)",
+      neutral: [250, 0.005], L: { bg: 0.16, card: 0.24, section: 0.22 }, accent: [248, 0.11], divider: "rgba(255, 255, 255, 0.08)",
       border: 0, chip: { on: "white", alpha: 0.09 },
       shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 12px 32px -12px rgba(0, 0, 0, 0.65)",
       glass: {
-        alpha: 0.075, blur: "blur(26px) saturate(180%)",
-        background: `${grain(1, 0.15)}, radial-gradient(90% 60% at 50% -10%, #2b2c3c 0%, transparent 70%), linear-gradient(170deg, #17171f 0%, #1b1b25 55%, #141419 100%) fixed`,
+        alpha: 0.075, blur: "blur(24px) saturate(120%)", header: 0.72,
+        background: "radial-gradient(90% 60% at 50% -10%, #2c2e33 0%, transparent 70%), linear-gradient(170deg, #161719 0%, #1a1b1e 55%, #131416 100%)",
       },
     },
     light: {
-      neutral: [60, 0.012], L: { bg: 0.94, card: 0.98, section: 0.95 }, accent: [272, 0.1], divider: "rgba(60, 40, 60, 0.08)", statePrefer: 0.64,
+      neutral: [250, 0.004], L: { bg: 0.94, card: 0.98, section: 0.95 }, accent: [250, 0.12], divider: "rgba(30, 35, 45, 0.08)", statePrefer: 0.64,
       // More white is the only "stronger" that reads on frosted white: hover and active step up clearly.
       border: 0, chip: { on: "white", alpha: 0.55, hover: { on: "white", alpha: 0.7 }, strong: { on: "white", alpha: 0.88 } },
-      shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 12px 32px -14px rgba(70, 50, 100, 0.3)",
+      shadow: "inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 12px 32px -14px rgba(20, 28, 40, 0.22)",
       glass: {
-        alpha: 0.5, blur: "blur(26px) saturate(180%)",
-        background: `${grain(0, 0.16)}, radial-gradient(90% 60% at 50% -10%, #fbfaf8 0%, transparent 70%), linear-gradient(170deg, #f1eeea 0%, #eae8ec 55%, #e6e5e9 100%) fixed`,
+        alpha: 0.5, blur: "blur(24px) saturate(120%)", header: 0.72,
+        background: "radial-gradient(90% 60% at 50% -10%, #fbfbfc 0%, transparent 70%), linear-gradient(170deg, #efeff1 0%, #e9eaed 55%, #e4e5e8 100%)",
       },
     },
   },
   {
     // Pulse Tonal: Material You-like. Rounder and borderless; filled tonal cards on a clean page (the inverse of
     // Pulse's white cards on stone), with light pills on the cards in light mode and accent-tinted ones in dark.
+    // Seed: a soft plum (hue 320). The earlier mauve (345) leaned red and made dark cards look brown-red.
     key: "tonal", name: "Pulse Tonal",
     shape: { radius: 24, control: 16, tileIcon: "14px" },
     font: '"SF Pro Rounded", ui-rounded, ' + SYSTEM_FONT,
-    dark: { neutral: [345, 0.022], L: { bg: 0.135, card: 0.235, section: 0.17 }, cardChroma: 1.9, accent: [345, 0.085], divider: "rgba(255, 230, 240, 0.06)",
+    dark: { neutral: [320, 0.016], L: { bg: 0.145, card: 0.235, section: 0.17 }, cardChroma: 1.6, accent: [320, 0.075], divider: "rgba(250, 235, 250, 0.06)",
       border: 0, shadow: "none", chip: { on: "accent", alpha: 0.16 } },
-    light: { neutral: [345, 0.022], L: { bg: 0.985, card: 0.938, section: 0.96 }, cardChroma: 1.5, accent: [345, 0.1], divider: "rgba(60, 30, 45, 0.07)", statePrefer: 0.6,
+    light: { neutral: [320, 0.016], L: { bg: 0.985, card: 0.94, section: 0.96 }, cardChroma: 1.4, accent: [320, 0.09], divider: "rgba(50, 30, 50, 0.07)", statePrefer: 0.6,
       // White pills on a tonal card; active is an accent tint (Material You's "selected"), since more white barely shows.
       border: 0, shadow: "none", chip: { on: "white", alpha: 0.62, hover: { on: "white", alpha: 0.8 }, strong: { on: "accent", alpha: 0.16 } } },
   },
@@ -108,6 +105,11 @@ export function derive(v, mode) {
   m.section = hex(s.L.section, nC, nH);
   m.text = hex(dark ? 0.94 : 0.2, nC * 0.6, nH);
   m.glass = s.glass ?? null;
+  // View glow: the view's own colour with a soft radial pool of light at the top. All hex, so the contrast
+  // check composites over both stops.
+  const g = s.glow;
+  m.viewStops = g ? [hex(g.top[0], g.top[1], g.hue), hex(g.base[0], g.base[1], g.hue)] : [];
+  m.background = g ? `radial-gradient(110% 55% at 50% -12%, ${m.viewStops[0]} 0%, ${m.viewStops[1]} 70%)` : null;
   // What text actually sits on: the solid card, or (Glass) the frosted card over each background stop.
   // Glass: every colour stop of the background gradient, so the check matches what HA paints.
   m.surfaces = m.glass ? m.glass.background.match(/#[0-9a-f]{6}/gi).map((stop) => mix("#ffffff", stop, m.glass.alpha)) : [m.card];
@@ -116,7 +118,9 @@ export function derive(v, mode) {
   // Chip colour is decided after the accent; until then text-tinted chips stand in for the check below.
   m.chipBase = s.chip.on === "white" ? "#ffffff" : m.text;
   const onChips = (min) => [(h) => Math.min(...m.surfaces.map((x) => ratio(h, mix(m.chipBase, x, m.chipFill)))), min];
-  m.text2 = solve(nC * 0.8, nH, [onAll(4.6), onChips(4.6), [(h) => ratio(h, m.bg), 4.6]], dark, dark ? 0.72 : 0.5);
+  const pages = [m.bg, ...m.viewStops];
+  const onPage = (min) => [(h) => Math.min(...pages.map((x) => ratio(h, x))), min];
+  m.text2 = solve(nC * 0.8, nH, [onAll(4.6), onChips(4.6), onPage(4.6)], dark, dark ? 0.72 : 0.5);
   m.disabled = hex(dark ? 0.5 : 0.72, nC, nH);
   const [aH, aC] = s.accent;
   m.accent = solve(aC, aH, [onAll(4.6), ...(dark ? [] : [[(h) => ratio("#ffffff", h), 4.6]])], dark, dark ? 0.78 : 0.5);
@@ -124,7 +128,7 @@ export function derive(v, mode) {
   if (s.chip.on === "accent") {
     m.chipBase = m.accent;
     // Re-check secondary text on the accent-tinted chips (darker/lighter if needed).
-    m.text2 = solve(nC * 0.8, nH, [onAll(4.6), onChips(4.6), [(h) => ratio(h, m.bg), 4.6]], dark, dark ? 0.72 : 0.5);
+    m.text2 = solve(nC * 0.8, nH, [onAll(4.6), onChips(4.6), onPage(4.6)], dark, dark ? 0.72 : 0.5);
   }
   // Hover and active (strong) steps: the same base a little stronger, unless the mode names its own.
   const step = (spec, add) => spec ? [spec.on === "white" ? "#ffffff" : spec.on === "accent" ? m.accent : m.text, spec.alpha] : [m.chipBase, +(m.chipFill + add).toFixed(3)];

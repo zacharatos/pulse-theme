@@ -27,6 +27,8 @@ jobs:
           git diff --exit-code themes/
       - name: Contrast meets WCAG AA
         run: node scripts/contrast.mjs
+      - name: The version has a CHANGELOG.md section
+        run: node scripts/check-version.mjs
       - name: Theme file is valid YAML
         run: |
           pip install --quiet pyyaml

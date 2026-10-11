@@ -45,7 +45,7 @@ function mode(v, m) {
     ...(glass ? { "ha-card-background": cardBg, "ha-card-backdrop-filter": glass.blur } : {}),
     "ha-card-border-color": m.divider,
     "ha-section-background-color": m.section,
-    "lovelace-background": glass ? glass.background : m.bg,
+    "lovelace-background": glass ? glass.background : m.background ?? m.bg,
     "divider-color": m.divider,
     "outline-color": m.divider,
     "primary-text-color": m.text,
@@ -67,7 +67,7 @@ function mode(v, m) {
   g.push(["Neutral scale for newer frontends, tinted to match the surfaces",
     Object.fromEntries(Object.entries(m.neutralScale).sort(([a], [b]) => parseFloat(a) - parseFloat(b)).map(([k, c]) => [`ha-color-neutral-${k}`, c]))]);
   g.push(["Header, sidebar and dialogs", {
-    "app-header-background-color": glass ? rgba(m.bg, 0.55) : m.bg,
+    "app-header-background-color": glass ? rgba(m.bg, glass.header) : m.bg,
     "app-header-text-color": m.text,
     ...(glass ? { "app-header-backdrop-filter": glass.blur } : {}),
     "sidebar-background-color": m.bg,

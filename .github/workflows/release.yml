@@ -17,7 +17,11 @@ jobs:
           node-version: 22
       - run: node scripts/build-theme.mjs && git diff --exit-code themes/
       - run: node scripts/contrast.mjs
+      - name: Tag matches package.json and has a CHANGELOG.md section
+        run: node scripts/check-version.mjs "${GITHUB_REF_NAME}"
+      - name: Release notes from CHANGELOG.md
+        run: node scripts/changelog-notes.mjs "${GITHUB_REF_NAME#v}" > release-notes.md
       - uses: softprops/action-gh-release@v2
         with:
           files: themes/pulse.yaml
-          generate_release_notes: true
+          body_path: release-notes.md

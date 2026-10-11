@@ -62,8 +62,12 @@ Don't write a commit message unless he asks for one. If he does, offer it as a s
 | `test/dashboard.html` | Browser harness: a whole dashboard laid out like a real home (greeting, alarm, Home Pulse, three Area Pulse rooms, Stock Pulse) with the real card bundles. `?popup=living` opens a room popup; `?from=<other checkout>/test/apply-theme.mjs` shows an older release for comparison. |
 | `test/preview.html` | Browser harness: applies a theme like HA does, native-style mock cards plus the three real Pulse card bundles from their sibling repos. README screenshots come from it. |
 | `docs/*.png` | README screenshots (from the preview harness). |
+| `docs/hero-*.jpg` | README hero: the Rooms column of `test/dashboard.html` in Pulse, Pulse Glass and Pulse Tonal side by side (1280×760 at 2×, cropped, 1600px wide). |
+| `CHANGELOG.md` | One section per version, newest first. The release workflow copies it into the GitHub release and refuses a version without one. |
+| `scripts/check-version.mjs`, `scripts/changelog-notes.mjs` | Release checks: the tag agrees with `package.json` and the version has a CHANGELOG section; print a version's section. |
+| `.github/ISSUE_TEMPLATE/` | Bug report and idea forms. |
 | `.github/workflows/validate.yml` | HACS action (category theme), generated file is up to date, contrast, YAML validity. |
-| `.github/workflows/release.yml` | On a `v*` tag: the same checks, then a GitHub release with `themes/pulse.yaml`. |
+| `.github/workflows/release.yml` | On a `v*` tag: the same checks, the version check, then a GitHub release with `themes/pulse.yaml` and the CHANGELOG section as its notes. |
 
 ## Checks
 
@@ -124,9 +128,26 @@ Lights use bright gold in light mode (`pulse-active`, `amber-color`): about 2.6:
 
 ### Pulse Glass
 
-- The background (`lovelace-background`) is pure CSS: a fine grain (an inline, percent-encoded SVG noise tile from `grain()` in `scripts/palette.mjs`, nothing downloaded), one soft pool of light at the top and a neutral base gradient. No colour fields: behind translucent cards they made cards look stateful (a red-orange card read as a problem). The hex colour stops are what the contrast check composites the frosted card over, so editing them changes contrast: run the check. The grain is left out of the check; the card's blur averages it away.
+- Graphite, not purple (1.4.0): neutral hue 250 at a chroma of 0.004–0.005, a clear blue accent (248–250), and neutral shadows. Timos found the earlier violet tint (285) and the lavender accent (272) too purple.
+- The background (`lovelace-background`) is pure CSS: one soft pool of light at the top and a neutral base gradient, all hex stops. No colour fields: behind translucent cards they made cards look stateful (a red-orange card read as a problem). The hex colour stops are what the contrast check composites the frosted card over, so editing them changes contrast: run the check.
+- **No grain, a gentle saturate, no `fixed`** (1.4.0). These are the likely causes of the blotches and smears Timos saw in the frosted areas (confirm in his HA): a blurred noise tile turns into uneven low-frequency patches, `saturate(180%)` amplified every unevenness behind the glass into colour, and `background-attachment: fixed` under a backdrop filter makes Chromium repaint the blur badly while scrolling. Don't bring any of them back. The blur is `blur(24px) saturate(120%)`; the header is 72% opaque so content scrolling under it smears less.
+- Nested cards each blur (every `ha-card` gets the filter), so a card inside a stack blurs the outer glass again. A theme can't target only the outer card; it is listed in the README.
 - Blur (`ha-card-backdrop-filter`, `app-header-backdrop-filter`, `ha-dialog-surface-backdrop-filter`) is the theme's only performance cost. Don't add more blurred surfaces. If old tablets stutter, the agreed fallback is a fourth theme, "Pulse Glass Lite", with the same values and no blur.
 - The sidebar can't blur, so it uses the page colour, not a translucent one.
+
+### Pulse dark: lamplight
+
+Pulse's dark mode (1.4.0) is the night-time twin of the light mode, because the plain grey dark mode "added nothing" (Timos). It has three things the other dark modes don't:
+
+- **A view glow.** `glow: { hue, base, top }` in the palette gives the view its own colour (`base`, a step lighter than the page colour that header and sidebar keep) and a soft radial pool of warm light at the top (`top`). It is emitted as hex stops in `lovelace-background`, so the contrast check measures page text over both, and `derive()` solves secondary text against them. It is ambient light on the page, never on a card, so it says nothing about state.
+- **Lifted cards:** a faint lit top edge (`inset 0 1px 0`) and a drop shadow, on top of the hairline.
+- **A bluer accent** (262) than the light mode's (272), which read as lavender on charcoal.
+
+Light mode is the one Timos likes most: don't change it as a side effect of dark-mode work (compare the `Pulse` light block of `themes/pulse.yaml` before and after).
+
+### Pulse Tonal: plum
+
+The seed is a soft plum (hue 320, neutral chroma 0.016, card chroma ×1.6 dark / ×1.4 light). The earlier mauve (345, chroma 0.022, ×1.9) leaned red and made dark cards look brown-red. Keep the seed away from red (it would read as a problem) and from green (it would read as "all good").
 
 ### Open doors and windows
 
@@ -161,9 +182,10 @@ The harness applies the theme exactly like HA, but its native cards are look-ali
 
 ## Conventions
 
-- **Releases:** you prepare the next version with every change (below); the maintainer commits and pushes the `vX.Y.Z` tag you named; the release workflow checks and publishes. You never tag or push.
+- **Releases:** you prepare the next version with every change (below), including its `CHANGELOG.md` section; the maintainer commits and pushes the `vX.Y.Z` tag you named; the release workflow checks and publishes, with that section as the release notes. You never tag or push.
+- **Changelog:** every change that reaches users gets a line under the next version in `CHANGELOG.md`, in the section of the variation it touches (**All variations**, **Pulse**, **Pulse Glass**, **Pulse Tonal**, **For card authors**), as *Added*, *Changed*, *Fixed* or *Removed*, and **Breaking** first when the user has to act. Write for the person who installed the theme, not for a developer. If the working tree already holds an unreleased section, add to it.
 - **Versions: every change carries its next version.** Read the latest tag on the remote (`git ls-remote --tags --refs origin | sed 's#.*refs/tags/##' | sort -V | tail -1`; if it can't be reached, the newest local tag, and say so). Bump **major** when something that worked stops working or the user has to act (a theme name or a `--pulse-*` token removed or renamed, a token changing meaning, a higher minimum Home Assistant), **minor** for something new or a deliberate change of the default look or behaviour, **patch** for fixes, polish, translations, refactors, docs, tests and CI. The biggest change decides; when torn, take the bigger. Write it to `version` in `package.json`, all equal, then rebuild. If the working tree already holds an unreleased bump, keep it unless today's change needs a bigger part (then derive again from the remote tag). End the hand-off with the tag and why: **Tag:** `vX.Y.Z` (latest on the remote: `vA.B.C`). **Minor**, because … The full rule is Rule 2 in the home base `AGENTS.md`.
 - **CI** (`validate.yml`): HACS validation, generated file is up to date, contrast, YAML validity. Run `npm run check` before handing off.
 - **No private data:** the harness and screenshots use invented names. Never put real entity IDs, addresses or photos in the repo.
-- **Screenshots** in `docs/` come from the preview harness at 1280×820. Refresh them when the look changes and the maintainer wants it.
+- **Screenshots** in `docs/` come from the preview harness at 1280×820, and the hero from the dashboard harness (see the code map). Refresh them when the look changes and the maintainer wants it. The README links them with absolute `raw.githubusercontent.com` URLs, because HACS shows the README inside Home Assistant, where relative paths don't load.
 - **Language:** comments and docs in plain, direct English.
