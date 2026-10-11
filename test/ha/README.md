@@ -1,17 +1,17 @@
 # Throwaway Home Assistant
 
-A local Home Assistant with the Pulse themes, the `demo` integration (invented lights, climate, media, locks, covers, sensors) and the three Pulse cards, for checking what the preview harness can't: real dashboards, dialogs, settings pages and HA's own components. **It never touches the live house.**
+A local Home Assistant with the Pulse themes, the `demo` integration (invented lights, climate, media, locks, covers, sensors) the Pulse Cards bundle and Stock Pulse, for checking what the preview harness can't: real dashboards, dialogs, settings pages and HA's own components. **It never touches the live house.**
 
 ## Run
 
-From the repo root, with Python 3.13 and the card repos next to this one (`../area-pulse-card`, `../home-pulse-card`, `../stock-pulse`):
+From the repo root, with Python 3.13 and the card repos next to this one (`../pulse-cards`, `../stock-pulse`):
 
 ```bash
 bash test/ha/run.sh                         # latest HA, venv in ./ha-test/.venv (first run takes a few minutes)
 HA_VERSION=2025.7.4 bash test/ha/run.sh     # our minimum version (use a separate venv: pass its path as the first argument)
 ```
 
-`run.sh` copies `themes/pulse.yaml`, the two card bundles and the Stock Pulse integration into `./ha-test/` (gitignored), starts HA on http://localhost:8123 and runs `setup.py`, which onboards it (user `alex`, password `throwaway-1234`, both local to this instance), adds Stock Pulse with four items, puts some demo entities in the Living Room and saves a sections dashboard, **Pulse test** (http://localhost:8123/pulse-test/home), with tile, area, entities, thermostat, media and button cards next to Home Pulse, Area Pulse and Stock Pulse.
+`run.sh` copies `themes/pulse.yaml`, the Pulse Cards bundle and the Stock Pulse integration into `./ha-test/` (gitignored), starts HA on http://localhost:8123 and runs `setup.py`, which onboards it (user `alex`, password `throwaway-1234`, both local to this instance), adds Stock Pulse with four items, puts some demo entities in the Living Room and saves a sections dashboard, **Pulse test** (http://localhost:8123/pulse-test/home), with tile, area, entities, thermostat, media and button cards next to Home Pulse, Area Pulse and Stock Pulse.
 
 Re-run `run.sh` after changing the theme or a card bundle; it copies the new files and is safe to run on an already set-up config. Stop HA with `kill <pid>` (printed at start).
 

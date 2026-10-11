@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Start a throwaway Home Assistant with the Pulse themes, the demo integration and the three Pulse cards.
+# Start a throwaway Home Assistant with the Pulse themes, the demo integration, the Pulse Cards bundle and Stock Pulse.
 # Never the live house: it runs on http://localhost:8123 from ./ha-test (gitignored).
 #
 #   bash test/ha/run.sh [path-to-venv]        default venv: ./ha-test/.venv (created on first run)
 #   HA_VERSION=2025.7.4 bash test/ha/run.sh   test a specific version (our minimum is 2025.7)
 #
-# Needs Python 3.13 and the sibling repos next to this one: ../area-pulse-card, ../home-pulse-card,
-# ../stock-pulse (their built bundles are copied in). See test/ha/README.md for what to look at.
+# Needs Python 3.13 and the sibling repos next to this one: ../pulse-cards and ../stock-pulse (their
+# built bundles are copied in). See test/ha/README.md for what to look at.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 ROOT="$PWD"; CFG="$ROOT/ha-test"; VENV="${1:-$CFG/.venv}"; PROJECTS="$(dirname "$ROOT")"
@@ -25,7 +25,9 @@ fi
 
 cp "$ROOT/test/ha/configuration.yaml" "$CFG/configuration.yaml"
 cp "$ROOT/themes/pulse.yaml" "$CFG/themes/"
-cp "$PROJECTS/area-pulse-card/dist/area-pulse-card.js" "$PROJECTS/home-pulse-card/dist/home-pulse-card.js" "$CFG/www/"
+# The per-card bundles from before Pulse Cards would load first and win, so they go.
+rm -f "$CFG/www/area-pulse-card.js" "$CFG/www/home-pulse-card.js"
+cp "$PROJECTS/pulse-cards/dist/pulse-cards.js" "$CFG/www/"
 rm -rf "$CFG/custom_components/stock_pulse"
 cp -r "$PROJECTS/stock-pulse/custom_components/stock_pulse" "$CFG/custom_components/"
 

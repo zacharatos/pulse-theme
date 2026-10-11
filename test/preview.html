@@ -16,9 +16,9 @@
   Query options: ?theme=pulse|glass|tonal|none (none = HA default)  ?dark=1  ?lang=el  ?width=380 (phone frame)
   Entity names are invented. Screenshots for the README come from this page.
 -->
-<script src="../../area-pulse-card/test/icons.js"></script>
+<script src="../../pulse-cards/cards/area-pulse-card/test/icons.js"></script>
 <script>window.__MDI = { ...window.MDI };</script>
-<script src="../../home-pulse-card/test/icons.js"></script>
+<script src="../../pulse-cards/cards/home-pulse-card/test/icons.js"></script>
 <script>window.__MDI = { ...window.__MDI, ...window.MDI };</script>
 <script src="../../stock-pulse/test/icons.js"></script>
 <script>window.MDI = { ...window.__MDI, ...window.MDI };</script>
@@ -347,11 +347,11 @@
     card.hass = hass;
     ours.appendChild(card);
   };
-  await load("../../home-pulse-card/dist/home-pulse-card.js", "home-pulse-card", { type: "custom:home-pulse-card", shortcuts: [
+  await load("../../pulse-cards/dist/pulse-cards.js", "home-pulse-card", { type: "custom:home-pulse-card", shortcuts: [
     { name: "Lights", icon: "mdi:lightbulb-group", navigation_path: "lights", badge: "lights" },
     { name: "Security", icon: "mdi:shield-half-full", navigation_path: "security" },
     { name: "Shopping", icon: "mdi:cart-outline", navigation_path: "shopping" }] }, "Home Pulse");
-  await load("../../area-pulse-card/dist/area-pulse-card.js", "area-pulse-card", { type: "custom:area-pulse-card", area: "living", actions: [{ preset: "lights_toggle" }, { preset: "everything_off" }] }, "Area Pulse");
+  await load("../../pulse-cards/dist/pulse-cards.js", "area-pulse-card", { type: "custom:area-pulse-card", area: "living", actions: [{ preset: "lights_toggle" }, { preset: "everything_off" }] }, "Area Pulse");
   await load("../../stock-pulse/custom_components/stock_pulse/frontend/stock-pulse-card.js", "stock-pulse-card", { type: "custom:stock-pulse-card", group_by: "none" }, "Stock Pulse");
   window.previewReady = true;
 </script>

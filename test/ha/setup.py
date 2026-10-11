@@ -74,10 +74,12 @@ async def main(config_dir: Path) -> None:
                         print("  !", msg["type"], res["error"].get("message"))
                     return res.get("result")
 
-        existing = {r["url"] for r in (await call({"type": "lovelace/resources"}) or [])}
-        for url in ("/local/area-pulse-card.js", "/local/home-pulse-card.js"):
-            if url not in existing:
-                await call({"type": "lovelace/resources/create", "res_type": "module", "url": url})
+        resources = await call({"type": "lovelace/resources"}) or []
+        for res in resources:  # the per-card bundles from before Pulse Cards
+            if res["url"] in ("/local/area-pulse-card.js", "/local/home-pulse-card.js"):
+                await call({"type": "lovelace/resources/delete", "resource_id": res["id"]})
+        if "/local/pulse-cards.js" not in {res["url"] for res in resources}:
+            await call({"type": "lovelace/resources/create", "res_type": "module", "url": "/local/pulse-cards.js"})
 
         inventory = (await call({"type": "stock_pulse/inventories"}))[0]["entry_id"]
         for item in [] if new_inventory != "create_entry" else [

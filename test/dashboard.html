@@ -18,9 +18,9 @@
     ?from=<path to another pulse-theme checkout's test/apply-theme.mjs> to compare against an older release
   Entity names are invented. Screenshots for the README come from this page.
 -->
-<script src="../../area-pulse-card/test/icons.js"></script>
+<script src="../../pulse-cards/cards/area-pulse-card/test/icons.js"></script>
 <script>window.__MDI = { ...window.MDI };</script>
-<script src="../../home-pulse-card/test/icons.js"></script>
+<script src="../../pulse-cards/cards/home-pulse-card/test/icons.js"></script>
 <script>window.__MDI = { ...window.__MDI, ...window.MDI };</script>
 <script src="../../stock-pulse/test/icons.js"></script>
 <script>window.MDI = { ...window.__MDI, ...window.MDI };</script>
@@ -292,7 +292,7 @@
     const el = document.createElement(tag);
     el.setConfig(config); el.hass = hass; col.appendChild(el); return el;
   };
-  const HP = "../../home-pulse-card/dist/home-pulse-card.js", AP = "../../area-pulse-card/dist/area-pulse-card.js";
+  const HP = "../../pulse-cards/dist/pulse-cards.js", AP = HP; // one bundle holds every Pulse card
   const col1 = document.getElementById("col1"), col2 = document.getElementById("col2"), col3 = document.getElementById("col3");
   // Icon-only shortcuts (Home Pulse Shortcuts: tiles like native tile cards), then the status card.
   await card(HP, "home-pulse-shortcuts-card", { type: "custom:home-pulse-shortcuts-card", show_names: false, columns: 5, shortcuts: [
